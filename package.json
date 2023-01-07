@@ -8,9 +8,9 @@
     "io/dist",
     "io/package.json",
     "io/README.md",
-    "view/build",
-    "view/package.json",
-    "view/README.md",
+    "ui/build",
+    "ui/package.json",
+    "ui/README.md",
     "CHANGELOG"
   ],
   "scripts": {
@@ -19,12 +19,12 @@
     "start-io": "nodemon io/dist/index.js",
     "start-io:prod": "nodemon io/dist/index.js",
     "build-io": "npm --prefix io run build",
-    "start-view": "npm --prefix view run start",
-    "start-view:prod": "http-server view/build -p 5003",
-    "build-view": "npm --prefix view run build",
-    "start-app:prod": "npm run start-io:prod & npm run start-view:prod",
-    "build-app": "npm run build-io && npm run build-view",
-    "start-app:dev": "npm --prefix io run watch & npm run start-io & npm run start-view"
+    "start-ui": "npm --prefix ui run start",
+    "start-ui:prod": "http-server ui/build -p 5003",
+    "build-ui": "npm --prefix ui run build",
+    "start-app:prod": "npm run start-io:prod & npm run start-ui:prod",
+    "build-app": "npm run build-io && npm run build-ui",
+    "start-app:dev": "npm --prefix io run watch & npm run start-io & npm run start-ui"
   },
   "repository": {
     "type": "git",
