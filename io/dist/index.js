@@ -3,15 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const testFolder = "..";
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
 const socket_io_1 = __importDefault(require("socket.io"));
-const skip = ["io", "node_modules"];
-const supported = new Set(["png", "svg"]);
+const configs_1 = __importDefault(require("./configs"));
+const supported = new Set(configs_1.default.formats);
+const rootPath = "./";
 const PORT = 5002;
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
@@ -32,7 +32,7 @@ const getExtension = (url) => {
 const readFolder = (dir, imagePaths = []) => {
     const files = fs_1.default.readdirSync(dir, { withFileTypes: true });
     files.forEach((file) => {
-        if (!skip.includes(file.name)) {
+        if (!configs_1.default.ignore.includes(file.name)) {
             if (file.isDirectory()) {
                 readFolder(dir + "/" + file.name, imagePaths);
                 return;
@@ -65,7 +65,7 @@ const getImageBuffer = async (urls) => {
 };
 io.on("connection", async (socket) => {
     console.log(`user connected to socket with id: ${socket.id}`);
-    const urls = readFolder(testFolder, []);
+    const urls = readFolder(rootPath, []);
     const images = await getImageBuffer(urls);
     socket.emit("load-images", { d: images, total: images.length });
 });

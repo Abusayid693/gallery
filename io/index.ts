@@ -1,20 +1,17 @@
-const testFolder = "..";
 import fs from "fs";
 import path from "path";
 import express from "express";
 import http from "http";
 import cors from "cors";
 import socket from "socket.io";
+import configs from "./configs";
+
+const supported = new Set(configs.formats);
 
 /**
- * Skip files or folder, default can be overwritten by a config file
+ * Root path from where script is run
  */
-const skip = ["io", "node_modules"];
-
-/**
- * Supported images types, default can be overwritten by a config file
- */
-const supported = new Set(["png", "svg"]);
+const rootPath = "./";
 
 const PORT = 5002;
 const app = express();
@@ -48,7 +45,7 @@ const readFolder = (
   const files = fs.readdirSync(dir, { withFileTypes: true });
 
   files.forEach((file) => {
-    if (!skip.includes(file.name)) {
+    if (!configs.ignore.includes(file.name)) {
       if (file.isDirectory()) {
         readFolder(dir + "/" + file.name, imagePaths);
         return;
@@ -91,7 +88,7 @@ const getImageBuffer = async (
 io.on("connection", async (socket) => {
   console.log(`user connected to socket with id: ${socket.id}`);
 
-  const urls = readFolder(testFolder, []);
+  const urls = readFolder(rootPath, []);
   const images = await getImageBuffer(urls);
   socket.emit("load-images", { d: images, total: images.length });
 });
