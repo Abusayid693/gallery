@@ -1,0 +1,30 @@
+{
+  "name": "react-gallery",
+  "version": "1.0.0",
+  "description": "A react plugin for maintaining all static assets for any node project (nextJS, CRA...).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abusayid693/react-gallery.git"
+  },
+  "keywords": [
+    "react-gallery"
+  ],
+  "author": "Rehane",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Abusayid693/react-gallery/issues"
+  },
+  "homepage": "https://github.com/Abusayid693/react-gallery#readme",
+  "dependencies": {
+    "prettier": "^2.8.1",
+    "prettierrc": "^0.0.0-5"
+  },
+  "devDependencies": {
+    "husky": "^7.0.0"
+  }
+}
