@@ -18,13 +18,16 @@ app.use((0, cors_1.default)());
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.default.Server(server, {
     cors: {
-        origin: '*',
-        methods: ['GET', 'POST']
-    }
+        origin: "*",
+        methods: ["GET", "POST"],
+    },
 });
-const isImage = (filePath) => {
-    const bool = supported.has(path_1.default.extname(filePath).slice(1).toLowerCase());
+const isImage = (s) => {
+    const bool = supported.has(s);
     return bool;
+};
+const getExtension = (url) => {
+    return path_1.default.extname(url).slice(1).toLowerCase();
 };
 const readFolder = (dir, imagePaths = []) => {
     const files = fs_1.default.readdirSync(dir, { withFileTypes: true });
@@ -34,18 +37,37 @@ const readFolder = (dir, imagePaths = []) => {
                 readFolder(dir + "/" + file.name, imagePaths);
                 return;
             }
-            if (isImage(file.name)) {
-                imagePaths.push(dir + "/" + file.name);
+            const fileExtention = getExtension(file.name);
+            if (isImage(fileExtention)) {
+                const data = { type: fileExtention, path: dir + "/" + file.name };
+                imagePaths.push(data);
             }
         }
     });
     return imagePaths;
 };
-const arr = readFolder(testFolder, []);
-console.log("arr :", arr);
-io.on('connection', socket => {
+const getImageBuffer = async (urls) => {
+    const images = [];
+    for (const url of urls) {
+        try {
+            let data = await fs_1.default.promises.readFile(url.path, "base64");
+            images.push({
+                path: url.path,
+                buffer: data,
+                type: url.type,
+            });
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }
+    return images;
+};
+io.on("connection", async (socket) => {
     console.log(`user connected to socket with id: ${socket.id}`);
-    socket.emit("load-images", { d: '' });
+    const urls = readFolder(testFolder, []);
+    const images = await getImageBuffer(urls);
+    socket.emit("load-images", { d: images, total: images.length });
 });
 server.listen(PORT, () => {
     console.log(`Server is listening on ${PORT}`);
