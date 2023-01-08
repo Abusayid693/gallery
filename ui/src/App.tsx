@@ -2,6 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import * as io from "./utils/io";
+import {Render} from "./containers/render"
 
 function App() {
   const [images, setImages] = useState<any[]>([]);
@@ -18,8 +19,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        {images?.map((image:any, index) => {
+        <Render images={images}/>
+        {/* {images?.map((image:any, index) => {
           if (image?.type === "svg") {
             return (
               <img
@@ -35,8 +36,7 @@ function App() {
               <img key={index} src={`data:image/png;base64,${image?.buffer}`}/>
             )
           }
-        })}
-
+        })} */}
         <p>Hello</p>
         <a
           className="App-link"
