@@ -31,7 +31,18 @@ export const Png: React.FC<Props> = ({buffer}) => {
   );
 };
 
+export const Ico: React.FC<Props> = ({buffer}) => {
+  const classes = useStyles();
+  return (
+    <img
+      className={classes.container}
+      src={`data:image/x-icon;base64,${buffer}`}
+    />
+  );
+};
+
 export const images = {
   svg: (props: Props) => <Svg {...props} />,
-  png: (props: Props) => <Png {...props} />
+  png: (props: Props) => <Png {...props} />,
+  ico: (props: Props) => <Ico {...props} />
 };
