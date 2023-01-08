@@ -5,6 +5,11 @@ import cors from 'cors';
 import socket from 'socket.io';
 import configs from './configs';
 import * as helpers from './helpers';
+const gifFrames = require('gif-frames');
+
+// gifFrames({ url: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif', frames: 0 }).then(function (frameData:any) {
+//   frameData[0].getImage().pipe(fs.createWriteStream('firstframe.jpg'));
+// });
 
 /**
  * Root path from where script is run
