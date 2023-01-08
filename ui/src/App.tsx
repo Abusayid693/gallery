@@ -3,7 +3,7 @@ import "./App.css";
 import React, { useEffect, useState } from "react";
 import * as io from "./utils/io";
 import {Render} from "./containers/render"
-
+import { Radio } from './components/radio';
 function App() {
   const [images, setImages] = useState<any[]>([]);
 
