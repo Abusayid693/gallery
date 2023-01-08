@@ -26,6 +26,7 @@ interface Props {
   images: {
     type: 'png' | 'svg';
     buffer: string;
+    name: string
   }[];
 }
 

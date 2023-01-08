@@ -1,6 +1,8 @@
 import {createUseStyles} from 'react-jss';
 import filterIcon from "../../assets/filter.svg"
 import {Slider} from "../slider"
+import {FilterOne} from "./filters/imageType"
+import {FilterTwo} from "./filters/sort"
 
 const useStyles = createUseStyles({
   constainer: {
@@ -39,7 +41,6 @@ const useStyles = createUseStyles({
 
 export const Filter = () => {
   const classes = useStyles();
-
   return (
     <div className={classes.constainer}>
       <div className={classes.filterHeader}>
@@ -48,6 +49,10 @@ export const Filter = () => {
       </div>
       <div className={classes.filterBody}>
         <Slider title='Home'>
+            <FilterOne/>
+        </Slider>
+        <Slider title='Types'>
+            <FilterTwo/>
         </Slider>
       </div>
     </div>

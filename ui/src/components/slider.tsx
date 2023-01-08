@@ -8,7 +8,7 @@ const useStyles = createUseStyles({
   container: {
     borderBottom: '1px solid #EDEEF7',
     borderTop: '1px solid #EDEEF7',
-    padding: '1rem',
+    padding: '1rem 0 1rem 0',
     cursor: 'pointer'
   },
   sliderHeader: {
@@ -16,6 +16,7 @@ const useStyles = createUseStyles({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    padding: '.7rem',
 
     '& img': {
       width: '1.2rem',
@@ -37,9 +38,9 @@ interface Props {
 
 export const Slider: React.FC<Props> = ({title, children}) => {
   const classes = useStyles();
-  const {isOpen, toggle} = useToggle();
+  const [isOpen, toggle] = useToggle();
   return (
-    <div className={classes.container}>
+    <div className={clsx(classes.container, 'noselect')}>
       <div onClick={toggle} className={classes.sliderHeader}>
         <span>{title}</span>
         <img src={collapseIcon} />
