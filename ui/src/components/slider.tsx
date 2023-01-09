@@ -25,10 +25,18 @@ const useStyles = createUseStyles({
     },
     '& span': {
       fontSize: '16px',
-      fontWeight:'500'
+      fontWeight: '500'
     }
   },
-  sliderBody: {}
+  sliderBody: {
+    maxHeight: '51px',
+    transition: 'max-height 0.2s ease-out',
+    overflow: 'hidden'
+  },
+  sliderBodyActive: {
+    maxHeight: 0,
+    transition: 'max-height 0.2s ease-out'
+  }
 });
 
 interface Props {
@@ -39,13 +47,21 @@ interface Props {
 export const Slider: React.FC<Props> = ({title, children}) => {
   const classes = useStyles();
   const [isOpen, toggle] = useToggle();
+
   return (
     <div className={clsx(classes.container, 'noselect')}>
       <div onClick={toggle} className={classes.sliderHeader}>
         <span>{title}</span>
         <img src={collapseIcon} />
       </div>
-      {isOpen && <div className={classes.sliderBody}>{children}</div>}
+      <div
+        className={clsx(
+          classes.sliderBody,
+          !isOpen && classes.sliderBodyActive
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 };
