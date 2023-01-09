@@ -1,5 +1,5 @@
-import {createUseStyles} from 'react-jss';
-import { Select } from '../../select';
+import { createUseStyles } from 'react-jss';
+import { Radio } from '../../radio';
 
 const useStyles = createUseStyles({
 
@@ -8,7 +8,7 @@ const useStyles = createUseStyles({
 export const FilterTwo = ()=>{
     return (
         <div>
-            <Select label='Size'/>
+            <Radio label='Size'/>
         </div>
     )
 }
