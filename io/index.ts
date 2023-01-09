@@ -2,6 +2,7 @@ import chokidar from 'chokidar';
 import cors from 'cors';
 import express from 'express';
 import http from 'http';
+import path from 'path';
 import socket from 'socket.io';
 import configs from './configs';
 import * as fileHandler from './modules/file';
@@ -28,6 +29,8 @@ const io = new socket.Server(server, {
   }
 });
 
+const ioHandler = require('./modules/io')(io, sockets);
+
 const watcher = chokidar.watch(['./**/*.svg'], {
   ignored: [/(^|[\/\\])\../, ...configs.ignore], // ignore dirs
   persistent: true,
@@ -39,14 +42,17 @@ watcher
   .on('change', async path => {
     // emit event here to with changed file data, consider multiple edge cases
     console.log(`File ${path} changed`);
+    await ioHandler.emitEditedFile(path);
   })
-  .on('add', path => {
+  .on('add', async path => {
     // emit event here to with new file data
     console.log(`File ${path} add`);
+    await ioHandler.emitAddedFile(path);
   })
   .on('unlink', path => {
     // emit event here when file is removed
     console.log(`File ${path} has been removed`);
+    ioHandler.emitDeletedFile(path);
   });
 
 io.on('connection', async socket => {
@@ -68,6 +74,22 @@ io.on('connection', async socket => {
   });
 });
 
+app.use(express.static(path.join(__dirname, '../../', 'ui/build')));
+app.use(express.static('public'));
+
+app.use((_, res) => {
+  res.sendFile(path.join(__dirname, '../../', 'ui/build'));
+});
+
 server.listen(PORT, () => {
   console.log(`Server is listening on ${PORT}`);
+
+  const url = 'http://localhost:5002';
+  const start =
+    process.platform == 'darwin'
+      ? 'open'
+      : process.platform == 'win32'
+      ? 'start'
+      : 'xdg-open';
+  // require('child_process').exec(start + ' ' + url);
 });
