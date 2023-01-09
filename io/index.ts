@@ -1,20 +1,19 @@
-import fs from 'fs';
+import chokidar from 'chokidar';
+import cors from 'cors';
 import express from 'express';
 import http from 'http';
-import cors from 'cors';
 import socket from 'socket.io';
 import configs from './configs';
-import * as helpers from './helpers';
-const gifFrames = require('gif-frames');
-
-// gifFrames({ url: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif', frames: 0 }).then(function (frameData:any) {
-//   frameData[0].getImage().pipe(fs.createWriteStream('firstframe.jpg'));
-// });
+import * as fileHandler from './modules/file';
 
 /**
  * Root path from where script is run
  */
 const rootPath = '.';
+/**
+ * Local sockets instances for soft refresh
+ */
+const sockets = new Set<string>([]);
 
 const PORT = 5002;
 const app = express();
@@ -29,74 +28,43 @@ const io = new socket.Server(server, {
   }
 });
 
-const readFolder = (
-  dir: string,
-  imagePaths: {
-    type: string;
-    path: string;
-    name: string;
-  }[] = [],
-  imageFormats: Set<string> = new Set([])
-) => {
-  const files = fs.readdirSync(dir, {withFileTypes: true});
+const watcher = chokidar.watch(['./**/*.svg'], {
+  ignored: [/(^|[\/\\])\../, ...configs.ignore], // ignore dirs
+  persistent: true,
+  awaitWriteFinish: false,
+  ignoreInitial: true
+});
 
-  files.forEach(file => {
-    if (!configs.ignore.includes(file.name)) {
-      if (file.isDirectory()) {
-        readFolder(dir + '/' + file.name, imagePaths, imageFormats);
-        return;
-      }
-      const fileExtention = helpers.getExtension(file.name);
-      if (helpers.isImage(fileExtention)) {
-        imageFormats.add(fileExtention);
-        const data = {
-          type: fileExtention,
-          path: dir + '/' + file.name,
-          name: file.name
-        };
-        imagePaths.push(data);
-      }
-    }
+watcher
+  .on('change', async path => {
+    // emit event here to with changed file data, consider multiple edge cases
+    console.log(`File ${path} changed`);
+  })
+  .on('add', path => {
+    // emit event here to with new file data
+    console.log(`File ${path} add`);
+  })
+  .on('unlink', path => {
+    // emit event here when file is removed
+    console.log(`File ${path} has been removed`);
   });
 
-  return {imagePaths, imageFormats};
-};
-
-const getImageBuffer = async (
-  urls: {
-    type: string;
-    path: string;
-  }[]
-) => {
-  const images: any[] = [];
-
-  for (const url of urls) {
-    try {
-      let data = await fs.promises.readFile(url.path, 'base64');
-      let size = helpers.getFilesizeInBytes(url.path);
-      let stats = helpers.getFileStat(url.path);
-      images.push({
-        buffer: data,
-        size,
-        ...url,
-        ...stats
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  return images;
-};
-
 io.on('connection', async socket => {
-  console.log(`user connected to socket with id: ${socket.id}`);
+  console.log(`instance connected to socket with id: ${socket.id}`);
+  sockets.add(socket.id);
 
-  const {imagePaths, imageFormats} = readFolder(rootPath);
-  const images = await getImageBuffer(imagePaths);
+  const {imagePaths, imageFormats} = fileHandler.readFolder(rootPath);
+  const images = await fileHandler.getImageBuffer(imagePaths);
+
   socket.emit('load-images', {
     d: images,
     total: images.length,
     imageFormats: [...imageFormats]
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`instance disconnected with id: ${socket.id}`);
+    sockets.delete(socket.id);
   });
 });
 
