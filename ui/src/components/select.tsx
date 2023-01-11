@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import {createUseStyles} from 'react-jss';
-import tickIcon from "../assets/tick.svg"
+import { createUseStyles } from 'react-jss';
+import tickIcon from "../assets/tick.svg";
 
 const useStyles = createUseStyles({
   container: {
@@ -46,7 +46,7 @@ const useStyles = createUseStyles({
 export const Select: React.FC<{
   isActive?: boolean;
   label?: string
-}> = ({isActive = true, label}) => {
+}> = ({isActive, label}) => {
   const classes = useStyles();
   return (
     <div

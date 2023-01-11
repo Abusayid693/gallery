@@ -1,8 +1,15 @@
+import { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import filterIcon from '../../assets/filter.svg';
+import { useAppSelector } from '../../hooks/redux';
 import { Slider } from '../slider';
+import { FilterThree } from "./filters/groupBy";
 import { FilterOne } from './filters/imageType';
 import { FilterTwo } from './filters/sort';
+import {
+  groupingOptions, GROUP_BY_TYPES, sortingOptions, SORT_BY_NAME,
+  SORT_BY_TYPES
+} from './types';
 
 const useStyles = createUseStyles({
   constainer: {
@@ -39,6 +46,31 @@ const useStyles = createUseStyles({
 
 export const Filter = () => {
   const classes = useStyles();
+  const {imageFormats} = useAppSelector(state => state.sate);
+  const [filter, setFilters] = useState<{
+    imageFormats: Record<string, boolean>;
+    sortBy: SORT_BY_TYPES;
+    groupBy: GROUP_BY_TYPES;
+  }>({
+    imageFormats: {},
+    sortBy: SORT_BY_NAME,
+    groupBy: null
+  });
+
+  const constructImageFormatsFilters = () => {
+    const obj = {};
+    imageFormats?.forEach(format => (obj[format] = true));
+
+    return obj;
+  };
+
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      imageFormats: constructImageFormatsFilters()
+    }));
+  }, [imageFormats]);
+
   return (
     <div className={classes.constainer}>
       <div className={classes.filterHeader}>
@@ -46,11 +78,17 @@ export const Filter = () => {
         <span>Filters</span>
       </div>
       <div className={classes.filterBody}>
-        <Slider totalElements={2} title="Types">
-          <FilterOne />
+        <Slider
+          totalElements={Object.keys(filter.imageFormats).length}
+          title="Types"
+        >
+          <FilterOne filters={filter.imageFormats} />
         </Slider>
-        <Slider totalElements={1} title="Sort">
-          <FilterTwo />
+        <Slider totalElements={sortingOptions.length} title="Sort">
+          <FilterTwo filter={filter.sortBy} />
+        </Slider>
+        <Slider totalElements={groupingOptions.length} title="Group by">
+          <FilterThree filter={filter.groupBy} />
         </Slider>
       </div>
     </div>

@@ -1,25 +1,31 @@
-import logo from "./logo.svg";
-import "./App.css";
-import React, { useEffect, useState } from "react";
-import * as io from "./utils/io";
-import {Render} from "./containers/render"
-import { Radio } from './components/radio';
+import { useEffect } from 'react';
+import './App.css';
+import { Render } from './containers/render';
+import { useAppDispatch, useAppSelector } from './hooks/redux';
+import { setStateData } from './store/state';
+import * as io from './utils/io';
+
 function App() {
-  const [images, setImages] = useState<any[]>([]);
+  const dispatch = useAppDispatch();
+  const store = useAppSelector(state => state.sate);
 
   useEffect(() => {
     const socket = io.connectWithSocketIOServer();
 
-    socket.on("load-images", (data:any) => {
-      console.log("load-iames :", data);
-      setImages(data.d);
+    socket.on('load-images', (data: any) => {
+      console.log('load-iames :', data);
+      dispatch(setStateData({images: data.d, imageFormats: data.imageFormats}));
+    });
+
+    socket.on('file-update', data => {
+      console.log('file-update :', data);
     });
   }, []);
- 
+
   return (
     <div className="App">
       <header className="App-header">
-        <Render images={images}/>
+        <Render images={store.images} />
         {/* {images?.map((image:any, index) => {
           if (image?.type === "svg") {
             return (
