@@ -3,11 +3,14 @@ import { createUseStyles } from 'react-jss';
 import filterIcon from '../../assets/filter.svg';
 import { useAppSelector } from '../../hooks/redux';
 import { Slider } from '../slider';
-import { FilterThree } from "./filters/groupBy";
+import { FilterThree } from './filters/groupBy';
 import { FilterOne } from './filters/imageType';
 import { FilterTwo } from './filters/sort';
 import {
-  groupingOptions, GROUP_BY_TYPES, sortingOptions, SORT_BY_NAME,
+  groupingOptions,
+  GROUP_BY_TYPES,
+  sortingOptions,
+  SORT_BY_NAME,
   SORT_BY_TYPES
 } from './types';
 
@@ -71,6 +74,35 @@ export const Filter = () => {
     }));
   }, [imageFormats]);
 
+  const handleFilterForImageFormats = (key: string) => {
+    setFilters(prev => ({
+      ...prev,
+      imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
+    }));
+  };
+
+  const handleFilterForSortBy = (key: SORT_BY_TYPES) => {
+    if (filter.sortBy === key) return;
+    setFilters(prev => ({
+      ...prev,
+      sortBy: key
+    }));
+  };
+
+  const handleFilterForGroupBy = (key: GROUP_BY_TYPES) => {
+    if (filter.groupBy === key) {
+      setFilters(prev => ({
+        ...prev,
+        groupBy: null
+      }));
+      return;
+    }
+    setFilters(prev => ({
+      ...prev,
+      groupBy: key
+    }));
+  };
+
   return (
     <div className={classes.constainer}>
       <div className={classes.filterHeader}>
@@ -82,13 +114,22 @@ export const Filter = () => {
           totalElements={Object.keys(filter.imageFormats).length}
           title="Types"
         >
-          <FilterOne filters={filter.imageFormats} />
+          <FilterOne
+            handleFilterChange={handleFilterForImageFormats}
+            filters={filter.imageFormats}
+          />
         </Slider>
         <Slider totalElements={sortingOptions.length} title="Sort">
-          <FilterTwo filter={filter.sortBy} />
+          <FilterTwo
+            handleFilterChange={handleFilterForSortBy}
+            filter={filter.sortBy}
+          />
         </Slider>
         <Slider totalElements={groupingOptions.length} title="Group by">
-          <FilterThree filter={filter.groupBy} />
+          <FilterThree
+            handleFilterChange={handleFilterForGroupBy}
+            filter={filter.groupBy}
+          />
         </Slider>
       </div>
     </div>

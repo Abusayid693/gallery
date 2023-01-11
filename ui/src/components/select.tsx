@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { createUseStyles } from 'react-jss';
-import tickIcon from "../assets/tick.svg";
+import tickIcon from '../assets/tick.svg';
 
 const useStyles = createUseStyles({
   container: {
@@ -22,7 +22,7 @@ const useStyles = createUseStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius:'5px',
+    borderRadius: '5px'
   },
 
   circleActive: {
@@ -37,25 +37,25 @@ const useStyles = createUseStyles({
   selectTitle: {
     fontWeight: 500
   },
-  selectIcon:{
-    width:'18px',
-    height:'18px'
+  selectIcon: {
+    width: '18px',
+    height: '18px'
   }
 });
 
 export const Select: React.FC<{
   isActive?: boolean;
-  label?: string
-}> = ({isActive, label}) => {
+  label?: string;
+  onClick?: VoidFunction;
+}> = ({isActive, label, ...any}) => {
   const classes = useStyles();
   return (
     <div
       className={clsx(classes.container, isActive && classes.containerActive)}
+      {...any}
     >
-      <div
-        className={clsx(classes.circle, isActive && classes.circleActive)}
-      >
-       {isActive && <img className={classes.selectIcon} src={tickIcon}/>}
+      <div className={clsx(classes.circle, isActive && classes.circleActive)}>
+        {isActive && <img className={classes.selectIcon} src={tickIcon} />}
       </div>
       <span className={classes.selectTitle}>{label}</span>
     </div>

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import {createUseStyles} from 'react-jss';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   container: {
@@ -40,12 +40,14 @@ const useStyles = createUseStyles({
 
 export const Radio: React.FC<{
   isActive?: boolean;
-  label?: string
-}> = ({isActive = true, label}) => {
+  label?: string;
+  onClick?: VoidFunction
+}> = ({isActive = true, label, ...any}) => {
   const classes = useStyles();
   return (
     <div
       className={clsx(classes.container, isActive && classes.containerActive)}
+      {...any}
     >
       <div
         className={clsx(classes.circle, isActive && classes.circleActive)}
