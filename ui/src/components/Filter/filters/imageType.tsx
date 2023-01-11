@@ -1,16 +1,22 @@
 import { createUseStyles } from 'react-jss';
 import { Select } from '../../select';
 
-const useStyles = createUseStyles({
+const useStyles = createUseStyles({});
 
-})
-
-export const FilterOne = ()=>{
-    return (
-        <div>
-            <Select isActive={false}  label='Types'/>
-            <Select isActive={false} label='Types'/>
-            <Select label='Types'/>
-        </div>
-    )
-}
+export const FilterOne: React.FC<{
+  filters: Record<string, boolean>;
+  handleFilterChange: (key: string) => void;
+}> = ({filters, handleFilterChange}) => {
+  console.log('filters :', filters);
+  return (
+    <div>
+      {Object.keys(filters).map(filter => (
+        <Select
+          onClick={() => handleFilterChange(filter)}
+          isActive={filters[filter]}
+          label={filter}
+        />
+      ))}
+    </div>
+  );
+};
