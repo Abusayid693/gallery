@@ -2,6 +2,7 @@ import chokidar from 'chokidar';
 import cors from 'cors';
 import express, { Express } from 'express';
 import http from 'http';
+import _ from 'lodash';
 import path from 'path';
 import socket from 'socket.io';
 import * as fileHandler from './modules/file';
@@ -34,12 +35,8 @@ module.exports = async (app: Express) => {
     console.log(`Server is listening on ${PORT}`);
     const url = 'http://localhost:5002';
     const start =
-      process.platform == 'darwin'
-        ? 'open'
-        : process.platform == 'win32'
-        ? 'start'
-        : 'xdg-open';
-    require('child_process').exec(start + ' ' + url);
+      process.platform == 'darwin' ? 'open' : process.platform == 'win32' ? 'start' : 'xdg-open';
+    // require('child_process').exec(start + ' ' + url);
   });
 
   const io = new socket.Server(server, {
@@ -78,15 +75,13 @@ module.exports = async (app: Express) => {
   io.on('connection', async socket => {
     console.log(`instance connected to socket with id: ${socket.id}`);
     sockets.add(socket.id);
-
-    const {imagePaths, imageFormats} = fileHandler.readFolder(
-      rootPath,
-      configs
-    );
+ 
+    const {imagePaths, imageFormats} = fileHandler.readFolder(rootPath, configs);
     const images = await fileHandler.getImageBuffer(imagePaths);
-
+    const newData = _.orderBy(images, (e) => e.name.toLowerCase());
+    
     socket.emit('load-images', {
-      d: images,
+      d: newData,
       total: images.length,
       imageFormats: [...imageFormats]
     });

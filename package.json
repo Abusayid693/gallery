@@ -16,15 +16,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
-    "start-io": "nodemon io/dist/index.js",
+    "start-io": "npm --prefix io run watch & nodemon io/dist/index.js",
     "start-io:prod": "nodemon io/dist/index.js",
     "build-io": "npm --prefix io run build",
     "start-ui": "npm --prefix ui run start",
-    "start-ui:prod": "http-server ui/build -p 5003",
+    "start-ui:prod": "http-server ui/build -p 3000",
     "build-ui": "npm --prefix ui run build",
-    "start-app:prod": "npm run start-io:prod & npm run start-ui:prod",
+    "start-app:prod": "npm run start-io:prod",
     "build-app": "npm run build-io && npm run build-ui",
-    "start-app:dev": "npm --prefix io run watch & npm run start-io & npm run start-ui"
+    "start-app:dev": "npm run start-io & npm run start-ui"
   },
   "repository": {
     "type": "git",

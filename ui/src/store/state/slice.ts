@@ -30,7 +30,7 @@ export const stateSlice = createSlice({
     },
 
     setFilterData: (state, {payload}) => {
-      const {isFiltered = true, isGrouped = true, data} = payload;
+      const {isFiltered = true, isGrouped = false, data} = payload;
 
       state.filteredImages = {
         isFiltered,

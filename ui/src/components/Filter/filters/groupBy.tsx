@@ -12,6 +12,7 @@ export const FilterThree: React.FC<{
     <div>
       {groupingOptions.map(option => (
         <Radio
+          key={option}
           onClick={() => handleFilterChange(option)}
           label={option}
           isActive={filter === option}
