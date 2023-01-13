@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import filterIcon from '../../assets/filter.svg';
 import { useAppSelector } from '../../hooks/redux';
@@ -14,8 +14,11 @@ import {
   SORT_BY_TYPES
 } from './types';
 
+import { useAppDispatch } from '../../hooks/redux';
 import { useFilterImageType } from '../../hooks/useFilterImageType';
+import { useFilterSortBy } from '../../hooks/useFilterSortBy';
 import { useLazyState } from '../../hooks/useLazyState';
+import { setFilterData } from '../../store/state';
 
 const useStyles = createUseStyles({
   constainer: {
@@ -52,7 +55,10 @@ const useStyles = createUseStyles({
 
 export const Filter = () => {
   const classes = useStyles();
-  const {imageFormats} = useAppSelector(state => state.sate);
+  const dispatch = useAppDispatch();
+  const {imageFormats, images} = useAppSelector(state => state.sate);
+  const [shouldApplyAllFilter, setShouldApplyAllFilter] = useState(false);
+  const isMounted = useRef(false);
 
   const [filter, setFilters] = useLazyState<{
     imageFormats: Record<string, boolean>;
@@ -64,7 +70,8 @@ export const Filter = () => {
     groupBy: null
   });
 
-  const applyImageTypeFilter = useFilterImageType();
+  const {apply: applyImageTypeFilter, applyLazy: applyImageTypeFilterLazy} = useFilterImageType();
+  const {apply: applySortByFilter, applyLazy: applySortByFilterLazy} = useFilterSortBy();
 
   const constructImageFormatsFilters = () => {
     const obj = {};
@@ -74,36 +81,60 @@ export const Filter = () => {
   };
 
   useEffect(() => {
-    setFilters(
-      prev => ({
-        ...prev,
-        imageFormats: constructImageFormatsFilters()
-      })
-    );
+    setFilters(prev => ({
+      ...prev,
+      imageFormats: constructImageFormatsFilters()
+    }));
   }, [imageFormats]);
+
+  /**
+   * Apply all filter on original unfiltered data in a chain
+   */
+  useEffect(() => {
+    if (isMounted.current) {
+      let filteredData = applyImageTypeFilterLazy(images, filter.imageFormats);
+      filteredData = applySortByFilterLazy(filteredData, filter.sortBy);
+      dispatch(setFilterData({data: filteredData}));
+    }
+
+    isMounted.current = true;
+  }, [shouldApplyAllFilter]);
 
   /**
    * This operation will add or remove data
    * @param key asset format to filter with
    */
   const handleFilterForImageFormats = (key: string) => {
-    const willFilterPerformAddition = !filter.imageFormats[key]
-    setFilters(
-      prev => ({
-        ...prev,
-        imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
-      }),
-      // callback to be triggered immediately with new state
-      state => applyImageTypeFilter(state.imageFormats, willFilterPerformAddition)
-    );
+    const willFilterPerformAddition = !filter.imageFormats[key];
+    if (!willFilterPerformAddition) {
+      setFilters(
+        prev => ({
+          ...prev,
+          imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
+        }),
+        // callback to be triggered immediately with new state
+        state => applyImageTypeFilter(state.imageFormats)
+      );
+      return;
+    }
+
+    setFilters(prev => ({
+      ...prev,
+      imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
+    }));
+    setShouldApplyAllFilter(prev => !prev);
   };
 
   const handleFilterForSortBy = (key: SORT_BY_TYPES) => {
     if (filter.sortBy === key) return;
-    setFilters(prev => ({
-      ...prev,
-      sortBy: key
-    }));
+    setFilters(
+      prev => ({
+        ...prev,
+        sortBy: key
+      }),
+      // callback to be triggered immediately with new state
+      (state) => applySortByFilter(state.sortBy)
+    );
   };
 
   const handleFilterForGroupBy = (key: GROUP_BY_TYPES) => {

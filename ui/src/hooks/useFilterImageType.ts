@@ -9,12 +9,11 @@ export const useFilterImageType = () => {
    */
   let prev = sate.filteredImages.isFiltered ? sate.filteredImages.data : sate.images;
 
-  const apply = (imageFormats: Record<string, boolean>, willFilterPerformAddition: boolean) => {
+  const apply = (imageFormats: Record<string, boolean>) => {
     /**
      * if willFilterPerformAddition then apply filter on old data by removing current filter
      * or else apply new filter on already filtered data
      */
-    prev = willFilterPerformAddition ? sate.images : prev;
 
     const newData = prev.filter(single => {
       return imageFormats[single.type];
@@ -23,5 +22,13 @@ export const useFilterImageType = () => {
     dispath(setFilterData({data: newData}));
   };
 
-  return apply;
+  const applyLazy = (data: any[], imageFormats: Record<string, boolean>) => {
+    const newData = data.filter(single => {
+      return imageFormats[single.type];
+    });
+
+    return newData;
+  };
+
+  return {apply, applyLazy};
 };
