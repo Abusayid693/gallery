@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
+const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+
 export const isImage = (s: string, configs: any) => {
   const supported = new Set(configs.formats);
   const bool = supported.has(s);
@@ -16,8 +18,11 @@ export const getExtension = (url: string) => {
 
 export const getFilesizeInBytes = (url: string) => {
   const stats = fs.statSync(url);
-  const fileSizeInBytes = stats.size;
-  return fileSizeInBytes;
+  const bytes = stats.size;
+  if (bytes == 0) return 'n/a';
+  const i = parseInt(String(Math.floor(Math.log(bytes) / Math.log(1024))));
+  if (i == 0) return {value: bytes.toLocaleString(), inBytes: bytes, type: sizes[i]};
+  return {value: (bytes / Math.pow(1024, i)).toFixed(1), inBytes: bytes, type: sizes[i]};
 };
 
 export const getFileStat = (url: string) => {
