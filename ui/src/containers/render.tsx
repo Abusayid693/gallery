@@ -1,7 +1,7 @@
 import React from 'react';
-import {createUseStyles} from 'react-jss';
-import {ImageContainer} from '../components/box';
-import {Filter} from '../components/Filter';
+import { createUseStyles } from 'react-jss';
+import { ImageContainer } from '../components/box';
+import { Filter } from '../components/Filter';
 
 const useStyles = createUseStyles({
   container: {
@@ -27,6 +27,7 @@ interface Props {
     type: 'png' | 'svg';
     buffer: string;
     name: string
+    pathname: string
   }[];
 }
 
@@ -38,8 +39,8 @@ export const Render: React.FC<Props> = ({images}) => {
         <Filter />
       </div>
       <div className={classes.viewContainer}>
-        {images.map(image => (
-          <ImageContainer image={image} />
+        {images.map((image, i) => (
+          <ImageContainer key={`${image.pathname}_${i}`} image={image} />
         ))}
       </div>
     </div>

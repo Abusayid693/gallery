@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { createUseStyles } from 'react-jss';
 import filterIcon from '../../assets/filter.svg';
 import { useAppSelector } from '../../hooks/redux';
@@ -13,6 +13,9 @@ import {
   SORT_BY_NAME,
   SORT_BY_TYPES
 } from './types';
+
+import { useFilterImageType } from '../../hooks/useFilterImageType';
+import { useLazyState } from '../../hooks/useLazyState';
 
 const useStyles = createUseStyles({
   constainer: {
@@ -50,7 +53,8 @@ const useStyles = createUseStyles({
 export const Filter = () => {
   const classes = useStyles();
   const {imageFormats} = useAppSelector(state => state.sate);
-  const [filter, setFilters] = useState<{
+
+  const [filter, setFilters] = useLazyState<{
     imageFormats: Record<string, boolean>;
     sortBy: SORT_BY_TYPES;
     groupBy: GROUP_BY_TYPES;
@@ -60,6 +64,8 @@ export const Filter = () => {
     groupBy: null
   });
 
+  const applyImageTypeFilter = useFilterImageType();
+
   const constructImageFormatsFilters = () => {
     const obj = {};
     imageFormats?.forEach(format => (obj[format] = true));
@@ -68,17 +74,28 @@ export const Filter = () => {
   };
 
   useEffect(() => {
-    setFilters(prev => ({
-      ...prev,
-      imageFormats: constructImageFormatsFilters()
-    }));
+    setFilters(
+      prev => ({
+        ...prev,
+        imageFormats: constructImageFormatsFilters()
+      })
+    );
   }, [imageFormats]);
 
+  /**
+   * This operation will add or remove data
+   * @param key asset format to filter with
+   */
   const handleFilterForImageFormats = (key: string) => {
-    setFilters(prev => ({
-      ...prev,
-      imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
-    }));
+    const willFilterPerformAddition = !filter.imageFormats[key]
+    setFilters(
+      prev => ({
+        ...prev,
+        imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
+      }),
+      // callback to be triggered immediately with new state
+      state => applyImageTypeFilter(state.imageFormats, willFilterPerformAddition)
+    );
   };
 
   const handleFilterForSortBy = (key: SORT_BY_TYPES) => {
@@ -110,26 +127,17 @@ export const Filter = () => {
         <span>Filters</span>
       </div>
       <div className={classes.filterBody}>
-        <Slider
-          totalElements={Object.keys(filter.imageFormats).length}
-          title="Types"
-        >
+        <Slider totalElements={Object.keys(filter.imageFormats).length} title="Types">
           <FilterOne
             handleFilterChange={handleFilterForImageFormats}
             filters={filter.imageFormats}
           />
         </Slider>
         <Slider totalElements={sortingOptions.length} title="Sort">
-          <FilterTwo
-            handleFilterChange={handleFilterForSortBy}
-            filter={filter.sortBy}
-          />
+          <FilterTwo handleFilterChange={handleFilterForSortBy} filter={filter.sortBy} />
         </Slider>
         <Slider totalElements={groupingOptions.length} title="Group by">
-          <FilterThree
-            handleFilterChange={handleFilterForGroupBy}
-            filter={filter.groupBy}
-          />
+          <FilterThree handleFilterChange={handleFilterForGroupBy} filter={filter.groupBy} />
         </Slider>
       </div>
     </div>

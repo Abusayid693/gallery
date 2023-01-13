@@ -12,6 +12,7 @@ export const FilterTwo: React.FC<{
     <div>
       {sortingOptions.map(option => (
         <Radio
+          key={option}
           onClick={() => handleFilterChange(option)}
           label={option}
           isActive={filter === option}

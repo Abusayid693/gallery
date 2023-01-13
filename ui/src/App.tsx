@@ -25,7 +25,9 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Render images={store.images} />
+        <Render
+          images={store.filteredImages.isFiltered ? store.filteredImages.data : store.images}
+        />
         {/* {images?.map((image:any, index) => {
           if (image?.type === "svg") {
             return (

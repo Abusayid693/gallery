@@ -12,6 +12,7 @@ export const FilterOne: React.FC<{
     <div>
       {Object.keys(filters).map(filter => (
         <Select
+          key={filter}
           onClick={() => handleFilterChange(filter)}
           isActive={filters[filter]}
           label={filter}
