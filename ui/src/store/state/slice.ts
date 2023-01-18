@@ -1,16 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initState = {
+const initState: {
+  images: any[];
+  imageFormats: any[];
+  filteredImages: {
+      isGrouped: boolean;
+      data: any[] | Record<string, any[]>;
+  };
+} = {
   images: [],
   /**
    * All image formats sent from socket eg: [svg, png....]
    */
   imageFormats: [],
   filteredImages: {
-    /**
-     * If data is filtered
-     */
-    isFiltered: false,
     /**
      * Is true only when grouping filter is applied
      */
@@ -27,13 +30,14 @@ export const stateSlice = createSlice({
       const {images, imageFormats} = payload;
       state.images = images;
       state.imageFormats = imageFormats;
+      state.filteredImages.data = images
     },
 
     setFilterData: (state, {payload}) => {
-      const {isFiltered = true, isGrouped = false, data} = payload;
+      const {isGrouped, data} = payload;
+      console.log('setFilterData :', data, isGrouped)
 
       state.filteredImages = {
-        isFiltered,
         isGrouped,
         data
       };

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 import filterIcon from '../../assets/filter.svg';
 import { useAppSelector } from '../../hooks/redux';
@@ -6,19 +6,14 @@ import { Slider } from '../slider';
 import { FilterThree } from './filters/groupBy';
 import { FilterOne } from './filters/imageType';
 import { FilterTwo } from './filters/sort';
-import {
-  groupingOptions,
-  GROUP_BY_TYPES,
-  sortingOptions,
-  SORT_BY_NAME,
-  SORT_BY_TYPES
-} from './types';
+import { groupingOptions, sortingOptions } from './types';
 
 import { useAppDispatch } from '../../hooks/redux';
-import { useFilterImageType } from '../../hooks/useFilterImageType';
-import { useFilterSortBy } from '../../hooks/useFilterSortBy';
-import { useLazyState } from '../../hooks/useLazyState';
+import { useDidMountEffect } from '../../hooks/useDidMountEffect';
 import { setFilterData } from '../../store/state';
+import * as helpers from '../../utils/helpers';
+//-
+import { setImageFormatFilter, setInitialImageFormats } from '../../store/filters';
 
 const useStyles = createUseStyles({
   constainer: {
@@ -56,99 +51,65 @@ const useStyles = createUseStyles({
 export const Filter = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const {imageFormats, images} = useAppSelector(state => state.sate);
-  const [shouldApplyAllFilter, setShouldApplyAllFilter] = useState(false);
-  const isMounted = useRef(false);
+  const sate = useAppSelector(state => state.sate);
+  const filter = useAppSelector(state => state.filters);
+  const freeze = useRef(true);
 
-  const [filter, setFilters] = useLazyState<{
-    imageFormats: Record<string, boolean>;
-    sortBy: SORT_BY_TYPES;
-    groupBy: GROUP_BY_TYPES;
-  }>({
-    imageFormats: {},
-    sortBy: SORT_BY_NAME,
-    groupBy: null
-  });
-
-  const {apply: applyImageTypeFilter, applyLazy: applyImageTypeFilterLazy} = useFilterImageType();
-  const {apply: applySortByFilter, applyLazy: applySortByFilterLazy} = useFilterSortBy();
+  const shouldApplyAllFilter = useRef(false);
 
   const constructImageFormatsFilters = () => {
     const obj = {};
-    imageFormats?.forEach(format => (obj[format] = true));
+    sate.imageFormats?.forEach(format => (obj[format] = true));
 
     return obj;
   };
 
   useEffect(() => {
-    setFilters(prev => ({
-      ...prev,
-      imageFormats: constructImageFormatsFilters()
-    }));
-  }, [imageFormats]);
+    dispatch(setInitialImageFormats({imageFormats: constructImageFormatsFilters()}));
+  }, [sate.imageFormats]);
 
   /**
    * Apply all filter on original unfiltered data in a chain
    */
-  useEffect(() => {
-    if (isMounted.current) {
-      let filteredData = applyImageTypeFilterLazy(images, filter.imageFormats);
-      filteredData = applySortByFilterLazy(filteredData, filter.sortBy);
+  useDidMountEffect(() => {
+    if (freeze.current) return;
+    if (shouldApplyAllFilter.current) {
+      let filteredData = helpers.getFilteredDataByImageType(sate.images, filter.imageFormats);
+      filteredData = helpers.getFilteredDataBySortBy(filteredData, filter.sortBy);
+      if (filter.groupBy) {
+        const filteredDataGrouped = helpers.getFilteredDataByGroup(filter.groupBy, filteredData);
+        dispatch(setFilterData({data: filteredDataGrouped, isGrouped: true}));
+        return;
+      }
       dispatch(setFilterData({data: filteredData}));
+      shouldApplyAllFilter.current = false;
+      return;
     }
+    applyImageTypeFilter();
+  }, [filter.imageFormats]);
 
-    isMounted.current = true;
-  }, [shouldApplyAllFilter]);
+  const applyImageTypeFilter = () => {
+    const prevData = helpers.getFormattedData(sate);
+    const newData = helpers.getFilteredDataByImageType(prevData, filter.imageFormats);
+
+    if (!filter.groupBy) {
+      dispatch(setFilterData({data: newData}));
+      return;
+    }
+    const groupedData = helpers.getFilteredDataByGroup(filter.groupBy, newData);
+    dispatch(setFilterData({data: groupedData, isGrouped: true}));
+  };
 
   /**
    * This operation will add or remove data
-   * @param key asset format to filter with
+   * @param key assets format to filter with
    */
   const handleFilterForImageFormats = (key: string) => {
     const willFilterPerformAddition = !filter.imageFormats[key];
-    if (!willFilterPerformAddition) {
-      setFilters(
-        prev => ({
-          ...prev,
-          imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
-        }),
-        // callback to be triggered immediately with new state
-        state => applyImageTypeFilter(state.imageFormats)
-      );
-      return;
-    }
-
-    setFilters(prev => ({
-      ...prev,
-      imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
-    }));
-    setShouldApplyAllFilter(prev => !prev);
-  };
-
-  const handleFilterForSortBy = (key: SORT_BY_TYPES) => {
-    if (filter.sortBy === key) return;
-    setFilters(
-      prev => ({
-        ...prev,
-        sortBy: key
-      }),
-      // callback to be triggered immediately with new state
-      (state) => applySortByFilter(state.sortBy)
-    );
-  };
-
-  const handleFilterForGroupBy = (key: GROUP_BY_TYPES) => {
-    if (filter.groupBy === key) {
-      setFilters(prev => ({
-        ...prev,
-        groupBy: null
-      }));
-      return;
-    }
-    setFilters(prev => ({
-      ...prev,
-      groupBy: key
-    }));
+    dispatch(setImageFormatFilter(key));
+    // [TODO]: review this if better approach possible
+    if (willFilterPerformAddition) shouldApplyAllFilter.current = true;
+    freeze.current = false;
   };
 
   return (
@@ -165,10 +126,10 @@ export const Filter = () => {
           />
         </Slider>
         <Slider totalElements={sortingOptions.length} title="Sort">
-          <FilterTwo handleFilterChange={handleFilterForSortBy} filter={filter.sortBy} />
+          <FilterTwo />
         </Slider>
         <Slider totalElements={groupingOptions.length} title="Group by">
-          <FilterThree handleFilterChange={handleFilterForGroupBy} filter={filter.groupBy} />
+          <FilterThree />
         </Slider>
       </div>
     </div>
