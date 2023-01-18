@@ -6,7 +6,7 @@ import { Slider } from '../slider';
 import { FilterThree } from './filters/groupBy';
 import { FilterOne } from './filters/imageType';
 import { FilterTwo } from './filters/sort';
-import { groupingOptions, GROUP_BY_TYPES, sortingOptions, SORT_BY_TYPES } from './types';
+import { groupingOptions, sortingOptions } from './types';
 
 import { useAppDispatch } from '../../hooks/redux';
 import { useDidMountEffect } from '../../hooks/useDidMountEffect';
@@ -18,9 +18,7 @@ import { setFilterData } from '../../store/state';
 //-
 import {
   setImageFormatFilter,
-  setInitialImageFormats,
-  setSortGroupByFilter,
-  setSortSortByFilter
+  setInitialImageFormats
 } from '../../store/filters';
 
 const useStyles = createUseStyles({
@@ -66,8 +64,8 @@ export const Filter = () => {
   const shouldApplyAllFilter = useRef(false);
 
   const [applyImageTypeFilter, applyImageTypeFilterLazy] = useFilterImageType();
-  const [applySortByFilter, applySortByFilterLazy] = useFilterSortBy();
-  const [applyGroupByFilter, removeGroupByFilter, applyGroupByFilterLazy] = useFilterGroupby();
+  const [, applySortByFilterLazy] = useFilterSortBy();
+  const [, , applyGroupByFilterLazy] = useFilterGroupby();
 
   const constructImageFormatsFilters = () => {
     const obj = {};
@@ -112,31 +110,6 @@ export const Filter = () => {
     freeze.current = false;
   };
 
-  useDidMountEffect(() => {
-    applySortByFilter(filter.sortBy);
-  }, [filter.sortBy]);
-
-  const handleFilterForSortBy = (key: SORT_BY_TYPES) => {
-    if (filter.sortBy === key) return;
-    dispatch(setSortSortByFilter(key));
-  };
-
-  useDidMountEffect(() => {
-    if (!filter.groupBy) {
-      removeGroupByFilter();
-      return;
-    }
-    applyGroupByFilter(filter.groupBy);
-  }, [filter.groupBy]);
-
-  const handleFilterForGroupBy = (key: GROUP_BY_TYPES) => {
-    if (filter.groupBy === key) {
-      dispatch(setSortGroupByFilter(null));
-      return;
-    }
-    dispatch(setSortGroupByFilter(key));
-  };
-
   return (
     <div className={classes.constainer}>
       <div className={classes.filterHeader}>
@@ -151,10 +124,10 @@ export const Filter = () => {
           />
         </Slider>
         <Slider totalElements={sortingOptions.length} title="Sort">
-          <FilterTwo handleFilterChange={handleFilterForSortBy} filter={filter.sortBy} />
+          <FilterTwo/>
         </Slider>
         <Slider totalElements={groupingOptions.length} title="Group by">
-          <FilterThree handleFilterChange={handleFilterForGroupBy} filter={filter.groupBy} />
+          <FilterThree />
         </Slider>
       </div>
     </div>
