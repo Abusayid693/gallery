@@ -10,7 +10,7 @@ export type SORT_BY_TYPES =
  export  const sortingOptions = [SORT_BY_NAME, SORT_BY_DATE, SORT_BY_SIZE];
 
 export const GROUP_BY_FORMAT = "type"
-export const GROUP_BY_DIRECTORY = "path"
+export const GROUP_BY_DIRECTORY = "directory"
 
 export type GROUP_BY_TYPES= typeof GROUP_BY_FORMAT | typeof GROUP_BY_DIRECTORY
 export const groupingOptions = [GROUP_BY_FORMAT, GROUP_BY_DIRECTORY]

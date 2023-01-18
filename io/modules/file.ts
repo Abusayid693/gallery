@@ -36,6 +36,10 @@ export const getFileName = (url: string) => {
   return path.basename(url);
 };
 
+export const getDirname = (url: string)=>{
+  return path.dirname(url)
+}
+
 export const getFileExtension = (url: string) => {
   return path.extname(url);
 };
@@ -77,6 +81,7 @@ export const getImageBufferData = async (url: string) => {
       path: url,
       name: getFileName(url),
       type: getExtension(url),
+      directory: getDirname(url),
       ...stats
     };
   } catch (error) {
