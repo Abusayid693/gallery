@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import './App.css';
-import { Render } from './containers/render';
+import { Render } from './containers';
 import { useAppDispatch, useAppSelector } from './hooks/redux';
 import { setStateData } from './store/state';
 import * as helper from './utils/helpers';

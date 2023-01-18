@@ -10,8 +10,6 @@ export const getSlicedString = (s: string) => {
 
 export const getFormattedData = (state?:any): any[] => {
   const sate = state ? state : store.getState().sate;
-
-  if (!sate.filteredImages.isFiltered) return sate.images;
   // @ts-ignore
   if (!sate.filteredImages.isGrouped) return sate.filteredImages.data;
   let arr = [];

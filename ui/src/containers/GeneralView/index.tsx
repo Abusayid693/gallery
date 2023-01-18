@@ -1,7 +1,9 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
-import { ImageContainer } from '../components/box';
-import { Filter } from '../components/Filter';
+import { ImageContainer } from '../../components/box';
+import { Filter } from '../../components/Filter';
+import { useAppSelector } from '../../hooks/redux';
+import { GroupRender } from './groupRender';
 
 const useStyles = createUseStyles({
   container: {
@@ -32,8 +34,12 @@ interface Props {
   isGrouped: boolean;
 }
 
-export const Render: React.FC<Props> = ({images, isGrouped}) => {
+export const Render: React.FC<Props> = ({}) => {
   const classes = useStyles();
+  const {
+    filteredImages: {isGrouped, data}
+  } = useAppSelector(state => state.sate);
+
   return (
     <div className={classes.container}>
       <div className={classes.filterContainer}>
@@ -41,14 +47,12 @@ export const Render: React.FC<Props> = ({images, isGrouped}) => {
       </div>
       {isGrouped ? (
         <div className={classes.viewContainer}>
-          <h1>Grouped</h1>
-          {images.map((image, i) => (
-            <ImageContainer key={`${image.pathname}_${i}`} image={image} />
-          ))}
+          <GroupRender data={data as Record<string, any[]>} />
         </div>
       ) : (
         <div className={classes.viewContainer}>
-          {images.map((image, i) => (
+          {/* @ts-ignore */}
+          {data.map((image, i) => (
             <ImageContainer key={`${image.pathname}_${i}`} image={image} />
           ))}
         </div>

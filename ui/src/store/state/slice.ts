@@ -4,7 +4,6 @@ const initState: {
   images: any[];
   imageFormats: any[];
   filteredImages: {
-      isFiltered: boolean;
       isGrouped: boolean;
       data: any[] | Record<string, any[]>;
   };
@@ -15,10 +14,6 @@ const initState: {
    */
   imageFormats: [],
   filteredImages: {
-    /**
-     * If data is filtered
-     */
-    isFiltered: false,
     /**
      * Is true only when grouping filter is applied
      */
@@ -35,14 +30,14 @@ export const stateSlice = createSlice({
       const {images, imageFormats} = payload;
       state.images = images;
       state.imageFormats = imageFormats;
+      state.filteredImages.data = images
     },
 
     setFilterData: (state, {payload}) => {
-      const {isFiltered = true, isGrouped, data} = payload;
+      const {isGrouped, data} = payload;
       console.log('setFilterData :', data, isGrouped)
 
       state.filteredImages = {
-        isFiltered,
         isGrouped,
         data
       };
