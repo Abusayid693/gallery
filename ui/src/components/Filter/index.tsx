@@ -92,7 +92,12 @@ export const Filter = () => {
     const prevData = helpers.getFormattedData(sate);
     const newData = helpers.getFilteredDataByImageType(prevData, filter.imageFormats);
 
-    dispatch(setFilterData({data: newData}));
+    if (!filter.groupBy) {
+      dispatch(setFilterData({data: newData}));
+      return;
+    }
+    const groupedData = helpers.getFilteredDataByGroup(filter.groupBy, newData);
+    dispatch(setFilterData({data: groupedData, isGrouped: true}));
   };
 
   /**

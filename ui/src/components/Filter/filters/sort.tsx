@@ -9,19 +9,25 @@ import { sortingOptions, SORT_BY_TYPES } from '../types';
 
 const useStyles = createUseStyles({});
 
-export const FilterTwo: React.FC<{
-}> = () => {
-  const dispatch = useAppDispatch()
-  const {sortBy} = useAppSelector((state) => state.filters)
+export const FilterTwo: React.FC<{}> = () => {
+  const dispatch = useAppDispatch();
+  const {sortBy, groupBy} = useAppSelector(state => state.filters);
   useDidMountEffect(() => {
     applySortByFilter();
   }, [sortBy]);
 
-  const applySortByFilter = ()=>{
+  const applySortByFilter = () => {
     const prevData = helpers.getFormattedData();
-    const newData = helpers.getFilteredDataBySortBy(prevData, sortBy);
-    dispatch(setFilterData({data: newData}));
-  }
+    const filteredData = helpers.getFilteredDataBySortBy(prevData, sortBy);
+
+    if (!groupBy) {
+      dispatch(setFilterData({data: filteredData}));
+      return;
+    }
+
+    const groupedData = helpers.getFilteredDataByGroup(groupBy, filteredData);
+    dispatch(setFilterData({data: groupedData, isGrouped: true}));
+  };
 
   const handleFilterForSortBy = (key: SORT_BY_TYPES) => {
     if (sortBy === key) return;
