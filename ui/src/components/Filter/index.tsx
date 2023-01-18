@@ -10,16 +10,10 @@ import { groupingOptions, sortingOptions } from './types';
 
 import { useAppDispatch } from '../../hooks/redux';
 import { useDidMountEffect } from '../../hooks/useDidMountEffect';
-import { useFilterGroupby } from '../../hooks/useFilterGroupby';
-import { useFilterImageType } from '../../hooks/useFilterImageType';
-import { useFilterSortBy } from '../../hooks/useFilterSortBy';
 import { setFilterData } from '../../store/state';
-
+import * as helpers from '../../utils/helpers';
 //-
-import {
-  setImageFormatFilter,
-  setInitialImageFormats
-} from '../../store/filters';
+import { setImageFormatFilter, setInitialImageFormats } from '../../store/filters';
 
 const useStyles = createUseStyles({
   constainer: {
@@ -57,26 +51,22 @@ const useStyles = createUseStyles({
 export const Filter = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const {imageFormats, images} = useAppSelector(state => state.sate);
+  const sate = useAppSelector(state => state.sate);
   const filter = useAppSelector(state => state.filters);
   const freeze = useRef(true);
 
   const shouldApplyAllFilter = useRef(false);
 
-  const [applyImageTypeFilter, applyImageTypeFilterLazy] = useFilterImageType();
-  const [, applySortByFilterLazy] = useFilterSortBy();
-  const [, , applyGroupByFilterLazy] = useFilterGroupby();
-
   const constructImageFormatsFilters = () => {
     const obj = {};
-    imageFormats?.forEach(format => (obj[format] = true));
+    sate.imageFormats?.forEach(format => (obj[format] = true));
 
     return obj;
   };
 
   useEffect(() => {
     dispatch(setInitialImageFormats({imageFormats: constructImageFormatsFilters()}));
-  }, [imageFormats]);
+  }, [sate.imageFormats]);
 
   /**
    * Apply all filter on original unfiltered data in a chain
@@ -84,10 +74,10 @@ export const Filter = () => {
   useDidMountEffect(() => {
     if (freeze.current) return;
     if (shouldApplyAllFilter.current) {
-      let filteredData = applyImageTypeFilterLazy(images, filter.imageFormats);
-      filteredData = applySortByFilterLazy(filteredData, filter.sortBy);
+      let filteredData = helpers.getFilteredDataByImageType(sate.images, filter.imageFormats);
+      filteredData = helpers.getFilteredDataBySortBy(filteredData, filter.sortBy);
       if (filter.groupBy) {
-        const filteredDataGrouped = applyGroupByFilterLazy(filter.groupBy, filteredData);
+        const filteredDataGrouped = helpers.getFilteredDataByGroup(filter.groupBy, filteredData);
         dispatch(setFilterData({data: filteredDataGrouped, isGrouped: true}));
         return;
       }
@@ -95,8 +85,15 @@ export const Filter = () => {
       shouldApplyAllFilter.current = false;
       return;
     }
-    applyImageTypeFilter(filter.imageFormats);
+    applyImageTypeFilter();
   }, [filter.imageFormats]);
+
+  const applyImageTypeFilter = () => {
+    const prevData = helpers.getFormattedData(sate);
+    const newData = helpers.getFilteredDataByImageType(prevData, filter.imageFormats);
+
+    dispatch(setFilterData({data: newData}));
+  };
 
   /**
    * This operation will add or remove data
@@ -124,7 +121,7 @@ export const Filter = () => {
           />
         </Slider>
         <Slider totalElements={sortingOptions.length} title="Sort">
-          <FilterTwo/>
+          <FilterTwo />
         </Slider>
         <Slider totalElements={groupingOptions.length} title="Group by">
           <FilterThree />

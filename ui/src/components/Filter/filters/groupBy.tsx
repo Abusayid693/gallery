@@ -1,26 +1,36 @@
 import { createUseStyles } from 'react-jss';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux';
 import { useDidMountEffect } from '../../../hooks/useDidMountEffect';
-import { useFilterGroupby } from '../../../hooks/useFilterGroupby';
 import { setSortGroupByFilter } from '../../../store/filters';
+import { setFilterData } from '../../../store/state';
+import * as helpers from '../../../utils/helpers';
 import { Radio } from '../../radio';
 import { groupingOptions, GROUP_BY_TYPES } from '../types';
 
 const useStyles = createUseStyles({});
 
-export const FilterThree: React.FC<{
-}> = () => {
+export const FilterThree: React.FC<{}> = () => {
   const {groupBy} = useAppSelector(state => state.filters);
   const dispatch = useAppDispatch();
-  const [applyGroupByFilter, removeGroupByFilter] = useFilterGroupby();
 
   useDidMountEffect(() => {
     if (!groupBy) {
       removeGroupByFilter();
       return;
     }
-    applyGroupByFilter(groupBy);
+    applyGroupByFilter();
   }, [groupBy]);
+
+  const applyGroupByFilter = () => {
+    const prevData = helpers.getFormattedData();
+    const newData = helpers.getFilteredDataByGroup(groupBy, prevData);
+    dispatch(setFilterData({data: newData, isGrouped: true}));
+  };
+
+  const removeGroupByFilter = () => {
+    const result = helpers.getFormattedData();
+    dispatch(setFilterData({data: result, isGrouped: false}));
+  };
 
   const handleFilterForGroupBy = (key: GROUP_BY_TYPES) => {
     if (groupBy === key) {
