@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import './App.css';
 import { Render } from './containers/render';
 import { useAppDispatch, useAppSelector } from './hooks/redux';
 import { setStateData } from './store/state';
+import * as helper from './utils/helpers';
 import * as io from './utils/io';
 
 function App() {
@@ -22,12 +23,16 @@ function App() {
     });
   }, []);
 
+  const images = useMemo(() => {
+    return helper.getFormattedData();
+  }, [store]);
+
+  console.log('images :', store)
+
   return (
     <div className="App">
       <header className="App-header">
-        <Render
-          images={store.filteredImages.isFiltered ? store.filteredImages.data : store.images}
-        />
+        <Render images={images} isGrouped={store.filteredImages.isGrouped} />
         {/* {images?.map((image:any, index) => {
           if (image?.type === "svg") {
             return (

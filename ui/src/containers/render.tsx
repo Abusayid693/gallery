@@ -7,7 +7,7 @@ const useStyles = createUseStyles({
   container: {
     display: 'flex',
     flexDirection: 'row',
-    paddingTop: '5rem',
+    paddingTop: '5rem'
   },
 
   filterContainer: {
@@ -26,23 +26,33 @@ interface Props {
   images: {
     type: 'png' | 'svg';
     buffer: string;
-    name: string
-    pathname: string
+    name: string;
+    pathname: string;
   }[];
+  isGrouped: boolean;
 }
 
-export const Render: React.FC<Props> = ({images}) => {
+export const Render: React.FC<Props> = ({images, isGrouped}) => {
   const classes = useStyles();
   return (
     <div className={classes.container}>
       <div className={classes.filterContainer}>
         <Filter />
       </div>
-      <div className={classes.viewContainer}>
-        {images.map((image, i) => (
-          <ImageContainer key={`${image.pathname}_${i}`} image={image} />
-        ))}
-      </div>
+      {isGrouped ? (
+        <div className={classes.viewContainer}>
+          <h1>Grouped</h1>
+          {images.map((image, i) => (
+            <ImageContainer key={`${image.pathname}_${i}`} image={image} />
+          ))}
+        </div>
+      ) : (
+        <div className={classes.viewContainer}>
+          {images.map((image, i) => (
+            <ImageContainer key={`${image.pathname}_${i}`} image={image} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 import filterIcon from '../../assets/filter.svg';
 import { useAppSelector } from '../../hooks/redux';
@@ -6,19 +6,22 @@ import { Slider } from '../slider';
 import { FilterThree } from './filters/groupBy';
 import { FilterOne } from './filters/imageType';
 import { FilterTwo } from './filters/sort';
-import {
-  groupingOptions,
-  GROUP_BY_TYPES,
-  sortingOptions,
-  SORT_BY_NAME,
-  SORT_BY_TYPES
-} from './types';
+import { groupingOptions, GROUP_BY_TYPES, sortingOptions, SORT_BY_TYPES } from './types';
 
 import { useAppDispatch } from '../../hooks/redux';
+import { useDidMountEffect } from '../../hooks/useDidMountEffect';
+import { useFilterGroupby } from '../../hooks/useFilterGroupby';
 import { useFilterImageType } from '../../hooks/useFilterImageType';
 import { useFilterSortBy } from '../../hooks/useFilterSortBy';
-import { useLazyState } from '../../hooks/useLazyState';
 import { setFilterData } from '../../store/state';
+
+//-
+import {
+  setImageFormatFilter,
+  setInitialImageFormats,
+  setSortGroupByFilter,
+  setSortSortByFilter
+} from '../../store/filters';
 
 const useStyles = createUseStyles({
   constainer: {
@@ -57,21 +60,14 @@ export const Filter = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const {imageFormats, images} = useAppSelector(state => state.sate);
-  const [shouldApplyAllFilter, setShouldApplyAllFilter] = useState(false);
-  const isMounted = useRef(false);
+  const filter = useAppSelector(state => state.filters);
+  const freeze = useRef(true);
 
-  const [filter, setFilters] = useLazyState<{
-    imageFormats: Record<string, boolean>;
-    sortBy: SORT_BY_TYPES;
-    groupBy: GROUP_BY_TYPES;
-  }>({
-    imageFormats: {},
-    sortBy: SORT_BY_NAME,
-    groupBy: null
-  });
+  const shouldApplyAllFilter = useRef(false);
 
-  const {apply: applyImageTypeFilter, applyLazy: applyImageTypeFilterLazy} = useFilterImageType();
-  const {apply: applySortByFilter, applyLazy: applySortByFilterLazy} = useFilterSortBy();
+  const [applyImageTypeFilter, applyImageTypeFilterLazy] = useFilterImageType();
+  const [applySortByFilter, applySortByFilterLazy] = useFilterSortBy();
+  const [applyGroupByFilter, removeGroupByFilter, applyGroupByFilterLazy] = useFilterGroupby();
 
   const constructImageFormatsFilters = () => {
     const obj = {};
@@ -81,74 +77,64 @@ export const Filter = () => {
   };
 
   useEffect(() => {
-    setFilters(prev => ({
-      ...prev,
-      imageFormats: constructImageFormatsFilters()
-    }));
+    dispatch(setInitialImageFormats({imageFormats: constructImageFormatsFilters()}));
   }, [imageFormats]);
 
   /**
    * Apply all filter on original unfiltered data in a chain
    */
-  useEffect(() => {
-    if (isMounted.current) {
+  useDidMountEffect(() => {
+    if (freeze.current) return;
+    if (shouldApplyAllFilter.current) {
       let filteredData = applyImageTypeFilterLazy(images, filter.imageFormats);
       filteredData = applySortByFilterLazy(filteredData, filter.sortBy);
+      if (filter.groupBy) {
+        const filteredDataGrouped = applyGroupByFilterLazy(filter.groupBy, filteredData);
+        dispatch(setFilterData({data: filteredDataGrouped, isGrouped: true}));
+        return;
+      }
       dispatch(setFilterData({data: filteredData}));
+      shouldApplyAllFilter.current = false;
+      return;
     }
-
-    isMounted.current = true;
-  }, [shouldApplyAllFilter]);
+    applyImageTypeFilter(filter.imageFormats);
+  }, [filter.imageFormats]);
 
   /**
    * This operation will add or remove data
-   * @param key asset format to filter with
+   * @param key assets format to filter with
    */
   const handleFilterForImageFormats = (key: string) => {
     const willFilterPerformAddition = !filter.imageFormats[key];
-    if (!willFilterPerformAddition) {
-      setFilters(
-        prev => ({
-          ...prev,
-          imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
-        }),
-        // callback to be triggered immediately with new state
-        state => applyImageTypeFilter(state.imageFormats)
-      );
-      return;
-    }
-
-    setFilters(prev => ({
-      ...prev,
-      imageFormats: {...prev.imageFormats, [key]: !prev.imageFormats[key]}
-    }));
-    setShouldApplyAllFilter(prev => !prev);
+    dispatch(setImageFormatFilter(key));
+    // [TODO]: review this if better approach possible
+    if (willFilterPerformAddition) shouldApplyAllFilter.current = true;
+    freeze.current = false;
   };
+
+  useDidMountEffect(() => {
+    applySortByFilter(filter.sortBy);
+  }, [filter.sortBy]);
 
   const handleFilterForSortBy = (key: SORT_BY_TYPES) => {
     if (filter.sortBy === key) return;
-    setFilters(
-      prev => ({
-        ...prev,
-        sortBy: key
-      }),
-      // callback to be triggered immediately with new state
-      (state) => applySortByFilter(state.sortBy)
-    );
+    dispatch(setSortSortByFilter(key));
   };
+
+  useDidMountEffect(() => {
+    if (!filter.groupBy) {
+      removeGroupByFilter();
+      return;
+    }
+    applyGroupByFilter(filter.groupBy);
+  }, [filter.groupBy]);
 
   const handleFilterForGroupBy = (key: GROUP_BY_TYPES) => {
     if (filter.groupBy === key) {
-      setFilters(prev => ({
-        ...prev,
-        groupBy: null
-      }));
+      dispatch(setSortGroupByFilter(null));
       return;
     }
-    setFilters(prev => ({
-      ...prev,
-      groupBy: key
-    }));
+    dispatch(setSortGroupByFilter(key));
   };
 
   return (

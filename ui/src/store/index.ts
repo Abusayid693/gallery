@@ -1,9 +1,11 @@
-import {configureStore, ThunkAction, Action} from '@reduxjs/toolkit';
+import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import filterReducer from "./filters";
 import stateReducer from './state';
 
 export const store = configureStore({
   reducer: {
-    sate: stateReducer
+    sate: stateReducer,
+    filters: filterReducer
   }
 });
 

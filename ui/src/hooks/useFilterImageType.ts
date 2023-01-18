@@ -1,13 +1,13 @@
-import { store } from '../store/index';
 import { setFilterData } from '../store/state';
+import * as helpers from "../utils/helpers";
+import { useAppDispatch, useAppSelector } from './redux';
 
-export const useFilterImageType = () => {
-  const {sate} = store.getState();
-  const dispath = store.dispatch;
-  /**
-   * Apply filter on top already filtered data
-   */
-  let prev = sate.filteredImages.isFiltered ? sate.filteredImages.data : sate.images;
+export const useFilterImageType = (): [
+  (imageFormats: Record<string, boolean>) => void,
+  (data: any[], imageFormats: Record<string, boolean>) => any[]
+] => {
+  const sate = useAppSelector((state) => state.sate)
+  const dispath = useAppDispatch();
 
   const apply = (imageFormats: Record<string, boolean>) => {
     /**
@@ -15,6 +15,7 @@ export const useFilterImageType = () => {
      * or else apply new filter on already filtered data
      */
 
+    const prev = helpers.getFormattedData(sate) 
     const newData = prev.filter(single => {
       return imageFormats[single.type];
     });
@@ -30,5 +31,5 @@ export const useFilterImageType = () => {
     return newData;
   };
 
-  return {apply, applyLazy};
+  return [apply, applyLazy];
 };

@@ -1,6 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initState = {
+const initState: {
+  images: any[];
+  imageFormats: any[];
+  filteredImages: {
+      isFiltered: boolean;
+      isGrouped: boolean;
+      data: any[] | Record<string, any[]>;
+  };
+} = {
   images: [],
   /**
    * All image formats sent from socket eg: [svg, png....]
@@ -30,7 +38,8 @@ export const stateSlice = createSlice({
     },
 
     setFilterData: (state, {payload}) => {
-      const {isFiltered = true, isGrouped = false, data} = payload;
+      const {isFiltered = true, isGrouped, data} = payload;
+      console.log('setFilterData :', data, isGrouped)
 
       state.filteredImages = {
         isFiltered,
