@@ -1,3 +1,4 @@
+import * as fileHandler from '../modules/file';
 import formats from './formats';
 import ignore from './ignore';
 import { schema } from './schema';
@@ -8,8 +9,13 @@ module.exports = async () => {
     formats
   };
 
-  const {error} = await schema.validate({formats:["svg"]});
-  if (error) throw new Error('Invalid configuration');
+  const customConfigs = await fileHandler.getConnfigurationData();
+  
+  const {error} = await schema.validate(customConfigs);
+  if (error) {
+    console.warn('Invalid configuration :', error);
+    throw new Error('Invalid configuration please check gallery.config file');
+  }
 
-  return config;
+  return {...config, ...customConfigs};
 };

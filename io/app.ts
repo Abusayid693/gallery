@@ -6,6 +6,7 @@ import _ from 'lodash';
 import path from 'path';
 import socket from 'socket.io';
 import * as fileHandler from './modules/file';
+import * as utils from './modules/utils';
 const _ioHandler = require('./modules/io');
 const _configuration = require('./configs');
 
@@ -48,7 +49,7 @@ module.exports = async (app: Express) => {
 
   const ioHandler = _ioHandler(io, sockets);
 
-  const watcher = chokidar.watch(['./**/*.svg'], {
+  const watcher = chokidar.watch(utils.generateChokidarWatchPattern(configs.formats), {
     ignored: [/(^|[\/\\])\../, ...configs.ignore], // ignore dirs
     persistent: true,
     awaitWriteFinish: false,
@@ -75,11 +76,11 @@ module.exports = async (app: Express) => {
   io.on('connection', async socket => {
     console.log(`instance connected to socket with id: ${socket.id}`);
     sockets.add(socket.id);
- 
+
     const {imagePaths, imageFormats} = fileHandler.readFolder(rootPath, configs);
     const images = await fileHandler.getImageBuffer(imagePaths);
-    const newData = _.orderBy(images, (e) => e.name.toLowerCase());
-    
+    const newData = _.orderBy(images, e => e.name.toLowerCase());
+
     socket.emit('load-images', {
       d: newData,
       total: images.length,

@@ -36,9 +36,9 @@ export const getFileName = (url: string) => {
   return path.basename(url);
 };
 
-export const getDirname = (url: string)=>{
-  return path.dirname(url)
-}
+export const getDirname = (url: string) => {
+  return path.dirname(url);
+};
 
 export const getFileExtension = (url: string) => {
   return path.extname(url);
@@ -102,4 +102,15 @@ export const getImageBuffer = async (urls: string[]) => {
     }
   }
   return images;
+};
+
+export const getConnfigurationData = async () => {
+  try {
+    const data = await fs.promises.readFile('./gallery.config.json', 'utf8');
+    const obj = JSON.parse(data);
+    return obj;
+  } catch (error) {
+    console.warn('Invalid configuration');
+    throw new Error('Invalid configuration');
+  }
 };
