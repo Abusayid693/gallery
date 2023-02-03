@@ -1,0 +1,8 @@
+{
+  "formats": ["png", "svg","ico", "gif"],
+  "ignore": ["node_modules",".husky",".vscode"],
+  "size": {
+    "png": 100,
+    "svg": 20
+  }
+}
