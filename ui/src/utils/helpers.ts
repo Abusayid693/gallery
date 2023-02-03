@@ -22,7 +22,11 @@ export const getFormattedData = (state?:any): any[] => {
 
 export const getFilteredDataByGroup = (type: GROUP_BY_TYPES, data: any[]) => {
     const result = _.mapValues(_.groupBy(data, type));
-    return result;
+    /**
+     * Get an object with all keys sorted
+     */
+    const l = _(result).toPairs().sortBy(0).fromPairs().value()
+    return l;
   };
 
   export const getFilteredDataByImageType = (data: any[], imageFormats: Record<string, boolean>) => {
