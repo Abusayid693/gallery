@@ -21,6 +21,14 @@ function App() {
     socket.on('file-update', data => {
       console.log('file-update :', data);
     });
+
+    socket.on("file-add", data=>{
+      console.log('file-add :', data);
+    })
+
+    socket.on("file-delete", data =>{
+      console.log('file-delete :', data);
+    })
   }, []);
 
   const images = useMemo(() => {
