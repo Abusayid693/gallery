@@ -5,10 +5,10 @@ import http from 'http';
 import _ from 'lodash';
 import path from 'path';
 import socket from 'socket.io';
+import { configs, prepareConfiguration } from "./configs";
 import * as fileHandler from './modules/file';
 import * as utils from './modules/utils';
 const _ioHandler = require('./modules/io');
-const _configuration = require('./configs');
 
 /**
  * Root path from where script is run
@@ -20,7 +20,7 @@ const rootPath = '.';
 const PORT = 5002;
 
 module.exports = async (app: Express) => {
-  const configs = await _configuration();
+  await prepareConfiguration();
   app.use(cors());
 
   app.use(express.static(path.join(__dirname, '../../', 'ui/build')));
@@ -77,7 +77,7 @@ module.exports = async (app: Express) => {
     console.log(`instance connected to socket with id: ${socket.id}`);
     sockets.add(socket.id);
 
-    const {imagePaths, imageFormats} = fileHandler.readFolder(rootPath, configs);
+    const {imagePaths, imageFormats} = fileHandler.readFolder(rootPath);
     const images = await fileHandler.getImageBuffer(imagePaths);
     const newData = _.orderBy(images, e => e.name.toLowerCase());
 
