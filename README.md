@@ -1,4 +1,4 @@
-![cover]()
+![cover](https://github.com/Abusayid693/gallery/blob/dev/.github/images/thumnail.png)
 
 <p align="center">
   <a href="https://opensource.org/license/mit/"><img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg"/></a>
