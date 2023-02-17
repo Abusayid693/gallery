@@ -3,8 +3,13 @@ import formats from './formats';
 import ignore from './ignore';
 import { schema } from './schema';
 
-module.exports = async () => {
-  let config = {
+export let configs:{
+  ignore: string[];
+  formats: string[];
+} = {} as any
+
+export const prepareConfiguration = async () => {
+  const _config = {
     ignore,
     formats
   };
@@ -17,5 +22,5 @@ module.exports = async () => {
     throw new Error('Invalid configuration please check gallery.config file');
   }
 
-  return {...config, ...customConfigs};
+  configs = {..._config, ...customConfigs};
 };

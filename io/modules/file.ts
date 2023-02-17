@@ -1,9 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+import { configs } from "../configs";
 
 const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
 
-export const isImage = (s: string, configs: any) => {
+export const isImage = (s: string) => {
   const supported = new Set(configs.formats);
   const bool = supported.has(s);
   return bool;
@@ -46,7 +47,6 @@ export const getFileExtension = (url: string) => {
 
 export const readFolder = (
   dir: string,
-  configs: any,
   imagePaths: string[] = [],
   imageFormats: Set<string> = new Set([])
 ) => {
@@ -55,11 +55,11 @@ export const readFolder = (
   files.forEach(file => {
     if (!configs.ignore.includes(file.name)) {
       if (file.isDirectory()) {
-        readFolder(dir + '/' + file.name, configs, imagePaths, imageFormats);
+        readFolder(dir + '/' + file.name, imagePaths, imageFormats);
         return;
       }
       const fileExtention = getExtension(file.name);
-      if (isImage(fileExtention, configs)) {
+      if (isImage(fileExtention)) {
         imageFormats.add(fileExtention);
         imagePaths.push(dir + '/' + file.name);
       }
