@@ -115,4 +115,4 @@ export default [
   'xbm',
   'xcf',
   'xpm'
-];
+] as const;

@@ -12,7 +12,7 @@ const _ioHandler = require('./modules/io');
 
 /**
  * Root path from where script is run
- */
+ */ 
 const rootPath = '.';
 /**
  * Local sockets instances for soft refresh
@@ -34,9 +34,9 @@ module.exports = async (app: Express) => {
 
   await server.listen(PORT, () => {
     console.log(`Server is listening on ${PORT}`);
-    const url = 'http://localhost:5002';
-    const start =
-      process.platform == 'darwin' ? 'open' : process.platform == 'win32' ? 'start' : 'xdg-open';
+    // const url = 'http://localhost:5002';
+    // const start =
+    //   process.platform == 'darwin' ? 'open' : process.platform == 'win32' ? 'start' : 'xdg-open';
     // require('child_process').exec(start + ' ' + url);
   });
 
@@ -66,7 +66,7 @@ module.exports = async (app: Express) => {
       // emit event here to with new file data
       console.log(`File ${path} add`);
       await ioHandler.emitAddedFile(path);
-    })
+    }) 
     .on('unlink', path => {
       // emit event here when file is removed
       console.log(`File ${path} has been removed`);

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { configs } from "../configs";
+import { configs, FormatsUnionType } from "../configs";
 
 const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
 
@@ -16,6 +16,10 @@ export const getExtension = (url: string) => {
     .slice(1)
     .toLowerCase();
 };
+
+export const getThresholdSize = (type: FormatsUnionType) => {
+  return typeof configs.size === "string"? configs.size  : configs.size[type]
+}
 
 export const getFilesizeInBytes = (url: string) => {
   const stats = fs.statSync(url);
@@ -71,17 +75,19 @@ export const readFolder = (
 
 export const getImageBufferData = async (url: string) => {
   try {
-    let data = await fs.promises.readFile(url, 'base64');
-    let size = getFilesizeInBytes(url);
-    let stats = getFileStat(url);
+    const data = await fs.promises.readFile(url, 'base64');
+    const size = getFilesizeInBytes(url);
+    const stats = getFileStat(url);
+    const type = getExtension(url) as FormatsUnionType;
 
     return {
       buffer: data,
       size,
       path: url,
       name: getFileName(url),
-      type: getExtension(url),
+      type: type,
       directory: getDirname(url),
+      thresholdSize: getThresholdSize(type) ,
       ...stats
     };
   } catch (error) {
