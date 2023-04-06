@@ -1,36 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import './App.css';
 import { Render } from './containers';
-import { useAppDispatch, useAppSelector } from './hooks/redux';
-import { setStateData } from './store/state';
+import { useAppSelector } from './hooks/redux';
 import * as helper from './utils/helpers';
-import * as io from './utils/io';
 
 function App() {
-  const dispatch = useAppDispatch();
   const store = useAppSelector(state => state.sate);
-
-  useEffect(() => {
-    const socket = io.connectWithSocketIOServer();
-
-    socket.on('load-images', (data: any) => {
-      console.log('load-iames :', data);
-      dispatch(setStateData({images: data.d, imageFormats: data.imageFormats}));
-    });
-
-    socket.on('file-update', data => {
-      console.log('file-update :', data);
-    });
-
-    socket.on("file-add", data=>{
-      console.log('file-add :', data);
-    })
-
-    socket.on("file-delete", data =>{
-      console.log('file-delete :', data);
-    })
-  }, []);
-
   const images = useMemo(() => {
     return helper.getFormattedData();
   }, [store]);
