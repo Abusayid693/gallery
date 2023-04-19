@@ -1,5 +1,12 @@
-import { stateSlice } from "./slice"
+import { stateSlice } from './slice';
 
-export const {setStateData, setFilterData} = stateSlice.actions
+export const {
+  setStateData,
+  setFilterData,
+  setImageFormatFilter,
+  setInitialImageFormats,
+  setSortSortByFilter,
+  setSortGroupByFilter
+} = stateSlice.actions;
 
-export default stateSlice.reducer
+export default stateSlice.reducer;

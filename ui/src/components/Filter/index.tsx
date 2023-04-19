@@ -10,10 +10,10 @@ import { groupingOptions, sortingOptions } from './types';
 
 import { useAppDispatch } from '../../hooks/redux';
 import { useDidMountEffect } from '../../hooks/useDidMountEffect';
-import { setFilterData } from '../../store/state';
+import { useMountSkip } from '../../hooks/useMountSkip';
+import { setFilterData, setImageFormatFilter, setInitialImageFormats } from '../../store/state';
 import * as helpers from '../../utils/helpers';
 //-
-import { setImageFormatFilter, setInitialImageFormats } from '../../store/filters';
 
 const useStyles = createUseStyles({
   constainer: {
@@ -52,7 +52,7 @@ export const Filter = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const sate = useAppSelector(state => state.sate);
-  const filter = useAppSelector(state => state.filters);
+  const filter = sate.filters;
   const freeze = useRef(true);
 
   const shouldApplyAllFilter = useRef(false);
@@ -68,11 +68,11 @@ export const Filter = () => {
     dispatch(setInitialImageFormats({imageFormats: constructImageFormatsFilters()}));
   }, [sate.imageFormats]);
 
-  /**
-   * Apply all filter on original unfiltered data in a chain
-   */
   useDidMountEffect(() => {
     if (freeze.current) return;
+    /**
+     * Apply all filter on original unfiltered data in a chain
+     */
     if (shouldApplyAllFilter.current) {
       let filteredData = helpers.getFilteredDataByImageType(sate.images, filter.imageFormats);
       filteredData = helpers.getFilteredDataBySortBy(filteredData, filter.sortBy);
@@ -85,8 +85,27 @@ export const Filter = () => {
       shouldApplyAllFilter.current = false;
       return;
     }
+    /**
+     * Apply imageFormats filter
+     */
     applyImageTypeFilter();
   }, [filter.imageFormats]);
+
+  /**
+   * Apply all filter on original unfiltered data in a chain on new image addition or deletion
+   */
+  useMountSkip(() => {
+    if (!sate.isFetched) return;
+    let filteredData = helpers.getFilteredDataByImageType(sate.images, filter.imageFormats);
+    filteredData = helpers.getFilteredDataBySortBy(filteredData, filter.sortBy);
+    if (filter.groupBy) {
+      const filteredDataGrouped = helpers.getFilteredDataByGroup(filter.groupBy, filteredData);
+      dispatch(setFilterData({data: filteredDataGrouped, isGrouped: true}));
+      return;
+    }
+    dispatch(setFilterData({data: filteredData}));
+    return;
+  }, [sate.images]);
 
   const applyImageTypeFilter = () => {
     const prevData = helpers.getFormattedData(sate);
@@ -105,6 +124,10 @@ export const Filter = () => {
    * @param key assets format to filter with
    */
   const handleFilterForImageFormats = (key: string) => {
+    /**
+     * if filter key is not present in the filters it means a
+     * new filter key will be added which will perform addition
+     */
     const willFilterPerformAddition = !filter.imageFormats[key];
     dispatch(setImageFormatFilter(key));
     // [TODO]: review this if better approach possible
