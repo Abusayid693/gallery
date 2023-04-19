@@ -4,7 +4,6 @@ export const {
   setStateData,
   setFilterData,
   setImageFormatFilter,
-  setInitialImageFormats,
   setSortSortByFilter,
   setSortGroupByFilter
 } = stateSlice.actions;

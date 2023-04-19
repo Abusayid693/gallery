@@ -9,7 +9,6 @@ const initState: {
   }
   isFetched: boolean,
   images: any[];
-  imageFormats: any[];
   filteredImages: {
       isGrouped: boolean;
       data: any[] | Record<string, any[]>;
@@ -26,7 +25,6 @@ const initState: {
   /**
    * All image formats sent from socket eg: [svg, png....]
    */
-  imageFormats: [],
   filteredImages: {
     /**
      * Is true only when grouping filter is applied
@@ -43,8 +41,11 @@ export const stateSlice = createSlice({
     setStateData: (state, {payload}) => {
       const {images, imageFormats} = payload;
 
+      const obj = {};
+      imageFormats?.forEach(format => (obj[format] = true));
+
       state.images = images;
-      state.imageFormats = imageFormats;
+      state.filters.imageFormats = obj;
       state.filteredImages.data = images
       state.isFetched = true;
     },
@@ -63,11 +64,6 @@ export const stateSlice = createSlice({
       const {data} = payload;
 
       state.images = [] 
-    },
-
-    setInitialImageFormats: (state, {payload}) => {
-      const {imageFormats} = payload;
-      state.filters.imageFormats = imageFormats;
     },
 
     setImageFormatFilter: (state, {payload}) => {

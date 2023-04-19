@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 import filterIcon from '../../assets/filter.svg';
 import { useAppSelector } from '../../hooks/redux';
@@ -11,7 +11,7 @@ import { groupingOptions, sortingOptions } from './types';
 import { useAppDispatch } from '../../hooks/redux';
 import { useDidMountEffect } from '../../hooks/useDidMountEffect';
 import { useMountSkip } from '../../hooks/useMountSkip';
-import { setFilterData, setImageFormatFilter, setInitialImageFormats } from '../../store/state';
+import { setFilterData, setImageFormatFilter } from '../../store/state';
 import * as helpers from '../../utils/helpers';
 //-
 
@@ -56,17 +56,6 @@ export const Filter = () => {
   const freeze = useRef(true);
 
   const shouldApplyAllFilter = useRef(false);
-
-  const constructImageFormatsFilters = () => {
-    const obj = {};
-    sate.imageFormats?.forEach(format => (obj[format] = true));
-
-    return obj;
-  };
-
-  useEffect(() => {
-    dispatch(setInitialImageFormats({imageFormats: constructImageFormatsFilters()}));
-  }, [sate.imageFormats]);
 
   useDidMountEffect(() => {
     if (freeze.current) return;
