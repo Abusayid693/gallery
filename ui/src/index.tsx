@@ -1,10 +1,10 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { store } from './store';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { SocketProvider } from "./contexts/socket";
 import './index.css';
+import reportWebVitals from './reportWebVitals';
+import { store } from './store';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -12,7 +12,9 @@ const root = createRoot(container);
 root.render(
   // <React.StrictMode>
     <Provider store={store}>
+      <SocketProvider>
       <App />
+      </SocketProvider>
     </Provider>
   // </React.StrictMode>
 );

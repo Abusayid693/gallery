@@ -1,16 +1,13 @@
-import { createUseStyles } from 'react-jss';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux';
 import { useDidMountEffect } from '../../../hooks/useDidMountEffect';
-import { setSortGroupByFilter } from '../../../store/filters';
-import { setFilterData } from '../../../store/state';
+import { setFilterData, setSortGroupByFilter } from '../../../store/state';
 import * as helpers from '../../../utils/helpers';
 import { Radio } from '../../radio';
-import { groupingOptions, GROUP_BY_TYPES } from '../types';
+import { GROUP_BY_TYPES, groupingOptions } from '../types';
 
-const useStyles = createUseStyles({});
 
 export const FilterThree: React.FC<{}> = () => {
-  const {groupBy} = useAppSelector(state => state.filters);
+  const {groupBy} = useAppSelector(state => state.sate.filters);
   const dispatch = useAppDispatch();
 
   useDidMountEffect(() => {

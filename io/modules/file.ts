@@ -110,6 +110,16 @@ export const getImageBuffer = async (urls: string[]) => {
   return images;
 };
 
+export const deleteFile = (path:string)=>{
+  fs.unlink(path, (error)=>{
+    if(error) {
+      console.error(`Error occoured at ${__filename}.deleteFile: ${error}`);
+      return
+    } 
+    console.info(`removed : ${path}`);
+  })
+}
+
 export const getConnfigurationData = async () => {
   try {
     const data = await fs.promises.readFile('./gallery.config.json', 'utf8');

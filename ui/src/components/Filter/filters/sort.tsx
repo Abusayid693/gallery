@@ -1,17 +1,16 @@
 import { createUseStyles } from 'react-jss';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux';
 import { useDidMountEffect } from '../../../hooks/useDidMountEffect';
-import { setSortSortByFilter } from '../../../store/filters';
-import { setFilterData } from '../../../store/state';
+import { setFilterData, setSortSortByFilter } from '../../../store/state';
 import * as helpers from '../../../utils/helpers';
 import { Radio } from '../../radio';
-import { sortingOptions, SORT_BY_TYPES } from '../types';
+import { SORT_BY_TYPES, sortingOptions } from '../types';
 
 const useStyles = createUseStyles({});
 
 export const FilterTwo: React.FC<{}> = () => {
   const dispatch = useAppDispatch();
-  const {sortBy, groupBy} = useAppSelector(state => state.filters);
+  const {sortBy, groupBy} = useAppSelector(state => state.sate.filters);
   useDidMountEffect(() => {
     applySortByFilter();
   }, [sortBy]);

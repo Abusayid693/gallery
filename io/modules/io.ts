@@ -1,10 +1,18 @@
-import socket from 'socket.io';
+import { Io, Socket } from "../types";
 import * as fileHandler from './file';
 
 module.exports = (
-  io: socket.Server<any, any, any, any>,
+  io: Io,
   sockets: Set<string>
 ) => {
+  /**
+   * Delete existing file
+   */
+  io.on("delete-file", (socket:Socket)=>{
+    const {path} = socket.data
+    fileHandler.deleteFile(path)
+  })
+
   async function emitEditedFile(url: string) {
     let data = await fileHandler.getImageBufferData(url);
     io.to([...sockets]).emit('file-update', {data, path: data?.path});
