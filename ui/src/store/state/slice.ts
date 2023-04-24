@@ -68,7 +68,14 @@ export const stateSlice = createSlice({
       state.images = [...state.images, data];
       state.filters.imageFormats = {...state.filters.imageFormats, [data.type]: true};
     },
-
+    /**
+     * Update state when existing file is deleted 
+     */
+    deleteExistingFile: (state, {payload})=>{
+      const {path} = payload;
+      state.images = state.images.filter((image)=> image.path !== path)
+    },
+ 
     setImageFormatFilter: (state, {payload}) => {
       const key = payload;
       state.filters.imageFormats[key] = !state.filters.imageFormats[key];

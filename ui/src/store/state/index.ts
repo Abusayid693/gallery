@@ -6,7 +6,8 @@ export const {
   setImageFormatFilter,
   setSortSortByFilter,
   setSortGroupByFilter,
-  addNewFile
+  addNewFile,
+  deleteExistingFile
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

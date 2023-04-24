@@ -85,6 +85,7 @@ export const Filter = () => {
    */
   useMountSkip(() => {
     if (!sate.isFetched) return;
+    console.log("Ima ")
     let filteredData = helpers.getFilteredDataByImageType(sate.images, filter.imageFormats);
     filteredData = helpers.getFilteredDataBySortBy(filteredData, filter.sortBy);
     if (filter.groupBy) {
@@ -93,7 +94,6 @@ export const Filter = () => {
       return;
     }
     dispatch(setFilterData({data: filteredData}));
-    return;
   }, [sate.images]);
 
   const applyImageTypeFilter = () => {

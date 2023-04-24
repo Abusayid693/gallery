@@ -20,11 +20,11 @@ module.exports = (
 
   async function emitAddedFile(url:string) {
     let data = await fileHandler.getImageBufferData(url);
-    io.to([...sockets]).emit('file-add', {data, path: data?.path});
+    io.to([...sockets]).emit('file-add', {data, path: './' + data?.path});
   }
 
   async function emitDeletedFile(url:string) {
-    io.to([...sockets]).emit('file-delete', {path: url});
+    io.to([...sockets]).emit('file-delete', {path: './' + url});
   }
 
   return {emitEditedFile, emitAddedFile, emitDeletedFile};
