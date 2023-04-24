@@ -1,5 +1,5 @@
 import React from 'react';
-import {createUseStyles} from 'react-jss';
+import { createUseStyles } from 'react-jss';
 interface Props {
   buffer: string;
 }
@@ -31,6 +31,16 @@ export const Png: React.FC<Props> = ({buffer}) => {
   );
 };
 
+export const Jpg: React.FC<Props> = ({buffer}) => {
+  const classes = useStyles();
+  return (
+    <img
+      className={classes.container}
+      src={`data:image/jpg;base64,${buffer}`}
+    />
+  );
+};
+
 export const Ico: React.FC<Props> = ({buffer}) => {
   const classes = useStyles();
   return (
@@ -56,4 +66,6 @@ export const images = {
   png: (props: Props) => <Png {...props} />,
   ico: (props: Props) => <Ico {...props} />,
   gif: (props: Props) => <Gif {...props} />,
+  jpg: (props: Props) => <Jpg {...props} />,
+  jpeg:(props: Props) => <Jpg {...props} />,
 };

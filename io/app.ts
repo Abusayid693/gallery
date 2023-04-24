@@ -60,17 +60,17 @@ module.exports = async (app: Express) => {
     .on('change', async path => {
       // emit event here to with changed file data, consider multiple edge cases
       console.log(`File ${path} changed`);
-      await ioHandler.emitEditedFile(path);
+      await ioHandler.emitEditedFile('./' + path);
     })
     .on('add', async path => {
       // emit event here to with new file data
       console.log(`File ${path} add`);
-      await ioHandler.emitAddedFile(path);
+      await ioHandler.emitAddedFile('./' + path);
     }) 
     .on('unlink', path => {
       // emit event here when file is removed
       console.log(`File ${path} has been removed`);
-      ioHandler.emitDeletedFile(path);
+      ioHandler.emitDeletedFile('./' + path);
     });
 
   io.on('connection', async socket => {
