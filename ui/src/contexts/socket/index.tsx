@@ -2,8 +2,8 @@ import { ReactNode, createContext, useContext, useEffect, useRef } from 'react';
 import io, { Socket } from 'socket.io-client';
 import { DefaultEventsMap } from 'socket.io-client/dist/socket.io';
 import { useAppDispatch } from '../../hooks/redux';
-import { setStateData } from '../../store/state';
-import { GET_ADDED_FILE, GET_DELETED_FILE_DATA, GET_UPDATED_FILE, LOAD_IMAGES } from "./constant";
+import { addNewFile, deleteExistingFile, setStateData } from '../../store/state';
+import { GET_ADDED_FILE, GET_DELETED_FILE_DATA, GET_UPDATED_FILE, LOAD_IMAGES } from './constant';
 
 const SERVER = 'http://localhost:5002';
 
@@ -37,10 +37,12 @@ const SocketProvider: React.FC<{
 
     socket.current.on(GET_ADDED_FILE, data => {
       console.log('file-add :', data);
+      dispatch(addNewFile(data));
     });
 
     socket.current.on(GET_DELETED_FILE_DATA, data => {
       console.log('file-delete :', data);
+      dispatch(deleteExistingFile(data))
     });
   }, []);
 
