@@ -2,20 +2,19 @@ import { createSlice } from '@reduxjs/toolkit';
 import { GROUP_BY_TYPES, SORT_BY_NAME, SORT_BY_TYPES } from './types';
 
 const initState: {
-  filters:{
-    imageFormats: {};
+  filters: {
+    imageFormats: Record<string, boolean>;
     sortBy: SORT_BY_TYPES;
     groupBy: GROUP_BY_TYPES | null;
-  }
-  isFetched: boolean,
+  };
+  isFetched: boolean;
   images: any[];
   filteredImages: {
-      isGrouped: boolean;
-      data: any[] | Record<string, any[]>;
+    isGrouped: boolean;
+    data: any[] | Record<string, any[]>;
   };
 } = {
-
-  filters:{
+  filters: {
     imageFormats: {},
     sortBy: SORT_BY_NAME,
     groupBy: null
@@ -46,24 +45,28 @@ export const stateSlice = createSlice({
 
       state.images = images;
       state.filters.imageFormats = obj;
-      state.filteredImages.data = images
+      state.filteredImages.data = images;
       state.isFetched = true;
     },
 
     setFilterData: (state, {payload}) => {
       const {isGrouped, data} = payload;
-      console.log('setFilterData :', data, isGrouped)
+      console.log('setFilterData :', data, isGrouped);
 
       state.filteredImages = {
         isGrouped,
         data
       };
     },
-
-    addNewFile: (state, {payload}) =>{
+    /**
+     * Add a new file in images and update imageFormats if new image 
+     * image format added
+     */
+    addNewFile: (state, {payload}) => {
       const {data} = payload;
 
-      state.images = [] 
+      state.images = [...state.images, data];
+      state.filters.imageFormats = {...state.filters.imageFormats, [data.type]: true};
     },
 
     setImageFormatFilter: (state, {payload}) => {
