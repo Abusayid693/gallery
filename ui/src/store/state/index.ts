@@ -7,7 +7,8 @@ export const {
   setSortSortByFilter,
   setSortGroupByFilter,
   addNewFile,
-  deleteExistingFile
+  deleteExistingFile,
+  updateExistingFile
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

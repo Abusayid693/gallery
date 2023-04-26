@@ -59,7 +59,7 @@ export const stateSlice = createSlice({
       };
     },
     /**
-     * Add a new file in images and update imageFormats if new image 
+     * Add a new file in images and update imageFormats if new image
      * image format added
      */
     addNewFile: (state, {payload}) => {
@@ -69,13 +69,26 @@ export const stateSlice = createSlice({
       state.filters.imageFormats = {...state.filters.imageFormats, [data.type]: true};
     },
     /**
-     * Update state when existing file is deleted 
+     * Update state when existing file is deleted
      */
-    deleteExistingFile: (state, {payload})=>{
+    deleteExistingFile: (state, {payload}) => {
       const {path} = payload;
-      state.images = state.images.filter((image)=> image.path !== path)
+      state.images = state.images.filter(image => image.path !== path);
     },
- 
+    /**
+     *
+     */
+    updateExistingFile: (state, {payload}) => {
+      const {path, data} = payload;
+
+      const oldImages = state.images;
+      const index = oldImages.findIndex(el => el.path === path);
+
+      oldImages[index] = data;
+
+      state.images = oldImages;
+    },
+
     setImageFormatFilter: (state, {payload}) => {
       const key = payload;
       state.filters.imageFormats[key] = !state.filters.imageFormats[key];
