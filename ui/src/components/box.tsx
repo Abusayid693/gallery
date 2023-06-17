@@ -1,9 +1,9 @@
-import React, {ReactNode} from 'react';
-import {createUseStyles} from 'react-jss';
-import {images as imageTypes} from '../components/imges';
-import * as helpers from '../utils/helpers';
-import {useToggle} from '../hooks/useToggle';
 import clsx from 'clsx';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import { images as imageTypes } from '../components/imges';
+import { useToggle } from '../hooks/useToggle';
+import * as helpers from '../utils/helpers';
 
 const useStyles = createUseStyles({
   container: {
@@ -20,6 +20,13 @@ const useStyles = createUseStyles({
     verticalAlign: 'middle',
     '&:hover': {
       backgroundColor: '#E6E6EA'
+    }
+  },
+
+  warningContainer: {
+    backgroundColor: 'rgba(185, 28, 28, 0.1)',
+    '&:hover': {
+      backgroundColor: 'rgba(185, 28, 28, 0.2)'
     }
   },
 
@@ -47,6 +54,11 @@ export const ImageContainer: React.FC<{
     type: 'png' | 'svg';
     buffer: string;
     name: string;
+    created: string;
+    directory: string;
+    path: string;
+    size: {value: string; inBytes: number; type: string};
+    thresholdSize: number;
   };
 }> = ({image}) => {
   const classes = useStyles();
@@ -56,12 +68,13 @@ export const ImageContainer: React.FC<{
     <div
       onMouseEnter={setHover}
       onMouseLeave={unsetHover}
-      className={classes.container}
+      className={clsx(
+        classes.container,
+        Number(image.size.value) > image.thresholdSize && classes.warningContainer
+      )}
     >
       {imageTypes?.[image.type]?.({buffer: image.buffer})}
-      <span className={clsx(classes.titleType, isHovered && classes.active)}>
-        {image.type}
-      </span>
+      <span className={clsx(classes.titleType, isHovered && classes.active)}>{image.type}</span>
       <span className={clsx(classes.titleName, isHovered && classes.active)}>
         {helpers.getSlicedString(image.name)}
       </span>
