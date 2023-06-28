@@ -1,7 +1,8 @@
 import React from 'react';
 import { createUseStyles } from 'react-jss';
-import { ImageContainer } from '../../components/box';
 import { Filter } from '../../components/Filter';
+import { ImageContainer } from '../../components/box';
+import { FullView } from "../../components/fullView";
 import { useAppSelector } from '../../hooks/redux';
 import { GroupRender } from './groupRender';
 
@@ -43,6 +44,7 @@ export const Render: React.FC<Props> = ({}) => {
   return (
     <div className={classes.container}>
       <div className={classes.filterContainer}>
+        <FullView/>
         <Filter />
       </div>
       {isGrouped ? (

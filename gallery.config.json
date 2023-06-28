@@ -1,5 +1,5 @@
 {
-  "formats": ["png", "svg","ico", "gif"],
+  "formats": ["png", "svg","ico", "gif", "jpeg"],
   "ignore": ["node_modules",".husky",".vscode"],
   "size": {
     "png": 100,
